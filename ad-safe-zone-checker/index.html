@@ -12,15 +12,15 @@
             theme: {
                 extend: {
                     colors: {
-                        cream: '#F5F4EF',
-                        surface: '#FFFFFF',
-                        border: { DEFAULT: '#E5E7EB', light: '#F0F0EC', input: '#D1D5DB' },
-                        accent: '#D97706',
-                        text: { primary: '#1A1A1A', mid: '#6B7280', dim: '#9CA3AF' },
+                        cream: 'transparent',
+                        surface: 'rgba(20, 20, 35, 0.7)',
+                        border: { DEFAULT: 'rgba(255,255,255,0.1)', light: 'rgba(255,255,255,0.06)', input: 'rgba(255,255,255,0.2)' },
+                        accent: '#3B82F6',
+                        text: { primary: '#FFFFFF', mid: 'rgba(255,255,255,0.6)', dim: 'rgba(255,255,255,0.4)' },
                         fn: {
-                            green: '#16A34A', 'green-bg': '#DCFCE7',
-                            red: '#EF4444', 'red-bg': '#FEE2E2',
-                            blue: '#3B82F6', 'blue-bg': '#DBEAFE',
+                            green: '#34D399', 'green-bg': 'rgba(52,211,153,0.15)',
+                            red: '#F87171', 'red-bg': 'rgba(248,113,113,0.15)',
+                            blue: '#60A5FA', 'blue-bg': 'rgba(96,165,250,0.15)',
                         },
                         fb: '#1877f2',
                     }
@@ -30,67 +30,82 @@
     </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #1A1A1A; }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #F5F4EF; }
-        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
-
-        /* Focus states - keyboard navigation */
-        :focus-visible { outline: 2px solid #D97706; outline-offset: 2px; border-radius: 4px; }
-        button:focus-visible, a:focus-visible { outline: 2px solid #D97706; outline-offset: 2px; }
-
-        /* Smooth transitions on interactive elements */
-        button, .upload-box, .tab-btn, .filter-btn, .toggle-track {
-            transition: all 0.15s ease;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 14px; line-height: 1.5; color: #fff; min-height: 100vh;
+        }
+        /* Layered gradient background simulating blurred room photo */
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: -1;
+            background:
+                radial-gradient(ellipse at 15% 30%, rgba(0, 80, 120, 0.35), transparent 55%),
+                radial-gradient(ellipse at 75% 15%, rgba(20, 60, 100, 0.4), transparent 50%),
+                radial-gradient(ellipse at 85% 70%, rgba(0, 70, 60, 0.3), transparent 55%),
+                radial-gradient(ellipse at 40% 80%, rgba(30, 50, 70, 0.25), transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(10, 30, 50, 0.2), transparent 70%),
+                linear-gradient(145deg, #0a1628 0%, #0f1b2d 30%, #1a1a2e 60%, #0d1b2a 100%);
         }
 
-        /* Upload box states */
-        .upload-box:hover { border-color: #D97706; background: #FFFBEB; }
-        .upload-box.drag-over { border-color: #D97706 !important; background: #FFFBEB !important; }
+        /* Glass utility classes */
+        .glass {
+            background: rgba(20, 20, 35, 0.7);
+            backdrop-filter: blur(20px) saturate(1.2);
+            -webkit-backdrop-filter: blur(20px) saturate(1.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        }
+        .glass-pill {
+            background: rgba(20, 20, 35, 0.75);
+            backdrop-filter: blur(24px) saturate(1.3);
+            -webkit-backdrop-filter: blur(24px) saturate(1.3);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+        .glass-subtle {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+        :focus-visible { outline: 2px solid #3B82F6; outline-offset: 2px; border-radius: 4px; }
+        button:focus-visible, a:focus-visible { outline: 2px solid #3B82F6; outline-offset: 2px; }
+
+        button, .upload-box, .tab-btn, .filter-btn, .toggle-track { transition: all 0.2s ease; }
+
+        .upload-box:hover { border-color: rgba(59,130,246,0.5) !important; background: rgba(59,130,246,0.08) !important; }
+        .upload-box.drag-over { border-color: rgba(59,130,246,0.7) !important; background: rgba(59,130,246,0.12) !important; }
 
         .safe-zone-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; display: none; }
         .safe-zone-overlay.active { display: block; }
-        .sz-danger {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.25);
-        }
-        .sz-line {
-            position: absolute;
-        }
-        .sz-line.horizontal {
-            height: 0; left: 0; right: 0;
-            border-top: 1.5px dashed rgba(0, 220, 130, 0.9);
-        }
-        .sz-line.vertical {
-            width: 0; top: 0; bottom: 0;
-            border-left: 1.5px dashed rgba(0, 220, 130, 0.9);
-        }
+        .sz-danger { position: absolute; background: rgba(0, 0, 0, 0.25); }
+        .sz-line { position: absolute; }
+        .sz-line.horizontal { height: 0; left: 0; right: 0; border-top: 1.5px dashed rgba(0, 220, 130, 0.9); }
+        .sz-line.vertical { width: 0; top: 0; bottom: 0; border-left: 1.5px dashed rgba(0, 220, 130, 0.9); }
         .sz-label {
-            position: absolute;
-            color: #00dc82;
-            font-size: 9px;
-            font-weight: 700;
-            white-space: nowrap;
-            direction: ltr;
-            text-align: center;
+            position: absolute; color: #00dc82; font-size: 9px; font-weight: 700;
+            white-space: nowrap; direction: ltr; text-align: center;
             font-family: -apple-system, sans-serif;
-            background: rgba(0,0,0,0.65);
-            padding: 2px 6px;
-            border-radius: 4px;
-            line-height: 1;
+            background: rgba(0,0,0,0.65); padding: 2px 6px; border-radius: 4px; line-height: 1;
         }
 
         .toggle-track {
             width: 40px; height: 22px; border-radius: 11px;
-            background: #D1D5DB; position: relative; cursor: pointer; transition: background 0.2s;
+            background: rgba(255,255,255,0.15); position: relative; cursor: pointer; transition: background 0.2s;
         }
         .toggle-track.on { background: #3B82F6; }
         .toggle-knob {
             width: 16px; height: 16px; border-radius: 50%; background: white;
             position: absolute; top: 3px; transition: 0.2s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
         }
         .toggle-track:not(.on) .toggle-knob { right: 3px; }
         .toggle-track.on .toggle-knob { right: 21px; }
@@ -98,39 +113,32 @@
         .mockup-media { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
         .mockup-media-abs { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
 
-        /* Carousel nav buttons */
         .carousel-nav {
             position: absolute; top: 50%; transform: translateY(-50%);
             width: 20px; height: 20px; border-radius: 50%;
             background: rgba(255,255,255,0.85); border: none; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            z-index: 25;
-            font-size: 10px; color: #333; line-height: 1;
+            z-index: 25; font-size: 10px; color: #333; line-height: 1;
         }
         .carousel-nav:hover { background: white; transform: translateY(-50%) scale(1.1); }
         .carousel-nav:active { transform: translateY(-50%) scale(0.95); }
         .carousel-nav.prev { left: 4px; }
         .carousel-nav.next { right: 4px; }
 
-        /* Feed carousel mockup */
         .feed-carousel-mockup {
             width: 100%; max-width: 300px; background: #fff;
-            border-radius: 8px; overflow: hidden; border: 1px solid #E5E7EB;
+            border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);
         }
         .feed-carousel-track {
-            display: flex; gap: 3px;
-            overflow-x: auto; scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
+            display: flex; gap: 3px; overflow-x: auto; scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none;
         }
         .feed-carousel-track::-webkit-scrollbar { display: none; }
-        .feed-carousel-slide {
-            flex: 0 0 78%; scroll-snap-align: start; position: relative;
-        }
+        .feed-carousel-slide { flex: 0 0 78%; scroll-snap-align: start; position: relative; }
 
         .feed-mockup {
             width: 100%; max-width: 320px; background: #fff;
-            border-radius: 8px; overflow: hidden; border: 1px solid #E5E7EB;
+            border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);
         }
 
         .vertical-mockup {
@@ -138,79 +146,46 @@
             overflow: hidden; position: relative; background: #000;
         }
 
-        /* Phone frame */
+        /* Phone frame - dark glass style */
         .phone-frame {
-            position: relative;
-            width: 210px;
-            background: #f8f8f8;
-            border-radius: 26px;
-            padding: 6px;
-            border: 1px solid #ddd;
+            position: relative; width: 210px;
+            background: #1a1a1a; border-radius: 26px; padding: 6px;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
         .phone-screen {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 9/19.5;
-            border-radius: 20px;
-            overflow: hidden;
-            background: #000;
+            position: relative; width: 100%; aspect-ratio: 9/19.5;
+            border-radius: 20px; overflow: hidden; background: #000;
         }
         .phone-notch {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70px;
-            height: 12px;
-            background: #000;
-            border-radius: 0 0 10px 10px;
-            z-index: 20;
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 70px; height: 12px; background: #000;
+            border-radius: 0 0 10px 10px; z-index: 20;
         }
         .phone-status-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 3px 8px 0;
-            z-index: 15;
-            font-size: 7px;
-            font-weight: 600;
-            color: #fff;
+            position: absolute; top: 0; left: 0; right: 0; height: 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 3px 8px 0; z-index: 15; font-size: 7px; font-weight: 600; color: #fff;
         }
         .phone-home-indicator {
-            position: absolute;
-            bottom: 3px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 3px;
-            background: rgba(255,255,255,0.4);
-            border-radius: 2px;
-            z-index: 20;
+            position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+            width: 50px; height: 3px; background: rgba(255,255,255,0.4);
+            border-radius: 2px; z-index: 20;
         }
         .phone-bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 24px;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 0 8px 6px;
-            z-index: 15;
+            position: absolute; bottom: 0; left: 0; right: 0; height: 24px;
+            background: #000; display: flex; align-items: center;
+            justify-content: space-around; padding: 0 8px 6px; z-index: 15;
         }
         .phone-bottom-nav svg { opacity: 0.85; }
 
-        .gdn-preview-container { position: relative; background: #fff; overflow: hidden; border: 1px solid #E5E7EB; border-radius: 4px; }
+        .gdn-preview-container {
+            position: relative; background: rgba(255,255,255,0.05); overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;
+        }
 
         .export-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100;
             display: none; align-items: center; justify-content: center;
         }
         .export-overlay.active { display: flex; }
@@ -218,61 +193,29 @@
         .tab-btn { transition: all 0.15s; }
         .filter-btn { transition: all 0.15s; }
 
-        /* Placement rows - horizontal scroll */
         .placement-row-scroll {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            scroll-snap-type: x proximity;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            padding-bottom: 2px;
+            display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px;
         }
         .placement-row-scroll::-webkit-scrollbar { display: none; }
-        .placement-row-scroll .pair-card {
-            flex: 0 0 auto;
-            scroll-snap-align: start;
-        }
-        /* Common mockup element styles */
-        .mockup-profile-pic { width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.3); flex-shrink: 0; }
-        .mockup-profile-pic-lg { width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.3); }
-        .mockup-profile-pic-feed { width: 28px; height: 28px; border-radius: 50%; background: #e0e0e0; }
-        .mockup-username { color: white; font-size: 7px; font-weight: 600; }
-        .mockup-username-lg { color: white; font-size: 8px; font-weight: 600; }
-        .mockup-sponsored { color: rgba(255,255,255,0.5); font-size: 5px; }
-        .mockup-sponsored-lg { color: rgba(255,255,255,0.5); font-size: 7px; }
-        .mockup-close-icon { margin-left: 2px; }
-        .mockup-dots-icon { }
-        .mockup-overlay-abs { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
-        .mockup-content-abs { position: absolute; inset: 0; overflow: hidden; }
-        .mockup-sz-abs { position: absolute; inset: 0; z-index: 8; }
-        .mockup-cta-btn { background: white; border-radius: 20px; padding: 5px 0; text-align: center; font-weight: 600; color: #333; display: flex; align-items: center; justify-content: center; gap: 3px; }
-        .mockup-cta-btn-sm { font-size: 7px; }
-        .mockup-cta-btn-md { font-size: 8px; }
-        .mockup-cta-btn-lg { font-size: 9px; }
-        .mockup-bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #000; }
-        .mockup-progress-bar { position: absolute; top: 20px; left: 6px; right: 6px; height: 1.5px; background: rgba(255,255,255,0.2); border-radius: 1px; }
-        .mockup-top-row { position: absolute; top: 25px; left: 6px; right: 6px; display: flex; align-items: center; gap: 4px; }
-        .mockup-side-actions { display: flex; flex-direction: column; gap: 5px; align-items: center; }
-        .mockup-action-count { color: white; font-size: 6px; font-weight: 600; }
-        .mockup-action-item { display: flex; flex-direction: column; align-items: center; gap: 0; }
-        .mockup-ad-label { color: rgba(255,255,255,0.4); font-size: 5px; }
-        .mockup-feed-header { display: flex; align-items: center; padding: 8px 10px; gap: 6px; }
-        .mockup-feed-username { font-size: 11px; font-weight: 600; color: #1a1a1a; }
-        .mockup-feed-sponsored { font-size: 9px; color: #999; }
+        .placement-row-scroll .pair-card { flex: 0 0 auto; scroll-snap-align: start; }
 
-        /* Print styles for PDF export */
+        /* Section titles */
+        .section-title { color: rgba(255,255,255,0.9); font-weight: 600; }
+
+        /* Print styles */
         @media print {
-            body { background: white !important; }
+            body { background: #111 !important; }
+            body::before { display: none !important; }
             header, .upload-box, .toggle-track, #export-img-btn, .carousel-nav, .filter-btn, #gdn-filter, .phone-notch { display: none !important; }
             .placement-row-scroll { overflow: visible !important; flex-wrap: wrap !important; }
             .pair-card { break-inside: avoid; }
             @page { margin: 10mm; }
         }
 
-        /* Responsive design */
+        /* Responsive */
         @media (max-width: 640px) {
-            header { flex-direction: column; gap: 8px; padding: 10px 12px; }
+            header { flex-direction: column; gap: 8px; padding: 10px 12px !important; border-radius: 0 !important; }
             header h1 { font-size: 15px; }
             header .flex.items-center.gap-2 { width: 100%; justify-content: space-between; }
             .tab-btn { font-size: 11px !important; padding: 6px 10px !important; }
@@ -287,20 +230,20 @@
         }
     </style>
 </head>
-<body class="bg-cream text-text-primary min-h-screen">
+<body class="min-h-screen text-white">
 
     <!-- Header -->
-    <header class="bg-surface border-b border-border px-6 py-3 flex items-center justify-between">
-        <h1 class="text-lg font-semibold">בדיקת Safe Zone למודעות</h1>
-        <div class="flex items-center gap-2">
-            <button id="export-img-btn" onclick="exportAsImage()" aria-label="ייצוא כתמונה" class="px-3 py-1.5 border border-border-input text-text-mid text-[12px] rounded-lg hover:bg-cream hover:text-text-primary transition-colors hidden">
+    <header class="glass-pill mx-4 mt-4 px-6 py-3 flex items-center justify-between">
+        <h1 class="text-lg font-semibold text-white">בדיקת Safe Zone למודעות</h1>
+        <div class="flex items-center gap-3">
+            <button id="export-img-btn" onclick="exportAsImage()" aria-label="ייצוא כתמונה" class="px-4 py-1.5 bg-accent text-white text-[12px] rounded-full font-medium hover:bg-blue-600 transition-colors hidden">
                 <span dir="ltr">PNG</span> ייצוא
             </button>
             <div class="flex" dir="ltr">
-                <button class="tab-btn px-4 py-1.5 text-[13px] font-medium rounded-l-lg" data-tab="facebook" onclick="switchTab('facebook')">
+                <button class="tab-btn px-5 py-1.5 text-[13px] font-medium rounded-l-full" data-tab="facebook" onclick="switchTab('facebook')">
                     Facebook & Instagram
                 </button>
-                <button class="tab-btn px-4 py-1.5 text-[13px] font-medium rounded-r-lg" data-tab="gdn" onclick="switchTab('gdn')">
+                <button class="tab-btn px-5 py-1.5 text-[13px] font-medium rounded-r-full" data-tab="gdn" onclick="switchTab('gdn')">
                     Google Display Network
                 </button>
             </div>
@@ -308,39 +251,39 @@
     </header>
 
     <!-- Notification -->
-    <div id="notification" class="fixed top-4 left-1/2 -translate-x-1/2 bg-surface border border-accent text-text-primary px-5 py-2.5 rounded-xl text-sm z-50 hidden" role="alert"></div>
+    <div id="notification" class="fixed top-4 left-1/2 -translate-x-1/2 glass-pill text-white px-5 py-2.5 text-sm z-50 hidden" role="alert"></div>
 
     <!-- ==================== FACEBOOK SECTION ==================== -->
     <div id="facebook-section" class="mx-auto px-4 py-5" style="max-width:100%;">
 
         <!-- Upload Area - compact inline -->
-        <div class="flex gap-2 mb-3 items-center flex-wrap">
-            <div class="upload-box flex items-center gap-2 bg-surface border border-dashed border-border-input rounded-lg px-3 py-2 cursor-pointer relative transition-all hover:border-accent"
+        <div class="flex gap-2 mb-4 items-center flex-wrap">
+            <div class="upload-box glass-subtle flex items-center gap-2 border-dashed !border-[rgba(255,255,255,0.15)] px-3 py-2 cursor-pointer relative transition-all"
                  id="story-upload" onclick="document.getElementById('story-input').click()"
                  ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'story')">
-                <button class="absolute top-1 left-1 w-4 h-4 text-text-dim rounded text-[10px] leading-none hidden z-20 hover:text-text-primary" onclick="event.stopPropagation(); clearMedia('story')" aria-label="Clear uploaded media">&times;</button>
-                <div id="story-icon"><svg class="text-text-dim" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div>
-                <div><div class="text-[12px] font-medium text-text-primary">תמונה בודדת</div><div class="text-[10px] text-text-dim">9:16</div></div>
+                <button class="absolute top-1 left-1 w-4 h-4 text-white/40 rounded text-[10px] leading-none hidden z-20 hover:text-white" onclick="event.stopPropagation(); clearMedia('story')" aria-label="Clear uploaded media">&times;</button>
+                <div id="story-icon"><svg class="text-white/40" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div>
+                <div><div class="text-[12px] font-medium text-white">תמונה בודדת</div><div class="text-[10px] text-white/40">9:16</div></div>
                 <input type="file" id="story-input" accept="image/*,video/*" class="hidden" onchange="handleUpload(event, 'story')">
                 <div id="story-preview-container" class="hidden"><img class="w-6 h-8 object-cover rounded" /></div>
             </div>
 
-            <div class="upload-box flex items-center gap-2 bg-surface border border-dashed border-border-input rounded-lg px-3 py-2 cursor-pointer relative transition-all hover:border-accent"
+            <div class="upload-box glass-subtle flex items-center gap-2 border-dashed !border-[rgba(255,255,255,0.15)] px-3 py-2 cursor-pointer relative transition-all"
                  id="carousel-upload" onclick="document.getElementById('carousel-input').click()"
                  ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleCarouselDrop(event)">
-                <button class="absolute top-1 left-1 w-4 h-4 text-text-dim rounded text-[10px] leading-none hidden z-20 hover:text-text-primary" onclick="event.stopPropagation(); clearCarousel()" aria-label="Clear carousel images">&times;</button>
-                <div id="carousel-icon"><svg class="text-text-dim" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="13" height="18" rx="2"/><rect x="9" y="3" width="13" height="18" rx="2"/></svg></div>
-                <div><div class="text-[12px] font-medium text-text-primary">קרוסלה 9:16</div><div class="text-[10px] text-text-dim">2-10</div></div>
+                <button class="absolute top-1 left-1 w-4 h-4 text-white/40 rounded text-[10px] leading-none hidden z-20 hover:text-white" onclick="event.stopPropagation(); clearCarousel()" aria-label="Clear carousel images">&times;</button>
+                <div id="carousel-icon"><svg class="text-white/40" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="13" height="18" rx="2"/><rect x="9" y="3" width="13" height="18" rx="2"/></svg></div>
+                <div><div class="text-[12px] font-medium text-white">קרוסלה 9:16</div><div class="text-[10px] text-white/40">2-10</div></div>
                 <input type="file" id="carousel-input" accept="image/*" multiple class="hidden" onchange="handleCarouselUpload(event)">
                 <div id="carousel-preview-container" class="hidden flex gap-0.5"></div>
             </div>
 
-            <div class="upload-box flex items-center gap-2 bg-surface border border-dashed border-border-input rounded-lg px-3 py-2 cursor-pointer relative transition-all hover:border-accent"
+            <div class="upload-box glass-subtle flex items-center gap-2 border-dashed !border-[rgba(255,255,255,0.15)] px-3 py-2 cursor-pointer relative transition-all"
                  id="carousel-sq-upload" onclick="document.getElementById('carousel-sq-input').click()"
                  ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleCarouselSqDrop(event)">
-                <button class="absolute top-1 left-1 w-4 h-4 text-text-dim rounded text-[10px] leading-none hidden z-20 hover:text-text-primary" onclick="event.stopPropagation(); clearCarouselSq()" aria-label="Clear feed carousel images">&times;</button>
-                <div id="carousel-sq-icon"><svg class="text-text-dim" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="16" rx="2"/><rect x="10" y="4" width="12" height="16" rx="2"/></svg></div>
-                <div><div class="text-[12px] font-medium text-text-primary">קרוסלה 1:1</div><div class="text-[10px] text-text-dim">2-10</div></div>
+                <button class="absolute top-1 left-1 w-4 h-4 text-white/40 rounded text-[10px] leading-none hidden z-20 hover:text-white" onclick="event.stopPropagation(); clearCarouselSq()" aria-label="Clear feed carousel images">&times;</button>
+                <div id="carousel-sq-icon"><svg class="text-white/40" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="16" rx="2"/><rect x="10" y="4" width="12" height="16" rx="2"/></svg></div>
+                <div><div class="text-[12px] font-medium text-white">קרוסלה 1:1</div><div class="text-[10px] text-white/40">2-10</div></div>
                 <input type="file" id="carousel-sq-input" accept="image/*" multiple class="hidden" onchange="handleCarouselSqUpload(event)">
                 <div id="carousel-sq-preview-container" class="hidden flex gap-0.5"></div>
             </div>
@@ -349,7 +292,7 @@
                 <div class="toggle-track on" id="sz-toggle" onclick="toggleSafeZones()" role="switch" aria-checked="true" aria-label="Toggle safe zones" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();toggleSafeZones();}">
                     <div class="toggle-knob"></div>
                 </div>
-                <span class="text-[11px] text-text-dim">Safe Zones</span>
+                <span class="text-[11px] text-white/40">Safe Zones</span>
             </div>
         </div>
 
@@ -361,14 +304,14 @@
     <!-- ==================== GDN SECTION ==================== -->
     <div id="gdn-section" class="max-w-[1400px] mx-auto px-6 py-7 hidden">
 
-        <div class="upload-box bg-surface border border-dashed border-border-input rounded-xl p-6 text-center cursor-pointer transition-all hover:border-accent mb-7"
+        <div class="upload-box glass border-dashed !border-[rgba(255,255,255,0.15)] p-6 text-center cursor-pointer transition-all mb-7"
              onclick="document.getElementById('gdn-input').click()"
              ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleGDNDrop(event)">
             <div class="mb-2">
-                <svg class="mx-auto text-text-dim" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                <svg class="mx-auto text-white/40" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
             </div>
-            <div class="text-sm font-medium text-text-primary mb-0.5">העלאת באנרים GDN</div>
-            <div class="text-xs text-text-dim mb-4">הגדלים מזוהים אוטומטית לפי רזולוציה או שם הקובץ</div>
+            <div class="text-sm font-medium text-white mb-0.5">העלאת באנרים GDN</div>
+            <div class="text-xs text-white/40 mb-4">הגדלים מזוהים אוטומטית לפי רזולוציה או שם הקובץ</div>
             <input type="file" id="gdn-input" accept="image/*" multiple class="hidden" onchange="handleGDNUpload(event)">
             <div id="gdn-badges" class="flex flex-wrap gap-1.5 justify-center"></div>
         </div>
@@ -376,8 +319,8 @@
         <!-- Website Mockups Section (on top) -->
         <div id="site-mockups-section" class="mb-8 hidden">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-semibold text-text-primary">תצוגה באתרים</h2>
-                <span class="text-xs text-text-dim">איך המודעות נראות באתרי המפרסמים</span>
+                <h2 class="text-sm font-semibold text-white">תצוגה באתרים</h2>
+                <span class="text-xs text-white/40">איך המודעות נראות באתרי המפרסמים</span>
             </div>
             <div id="site-mockups-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </div>
@@ -385,7 +328,7 @@
         <!-- Size Grid -->
         <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-3">
-                <h2 class="text-sm font-semibold text-text-primary">גדלים שהועלו</h2>
+                <h2 class="text-sm font-semibold text-white">גדלים שהועלו</h2>
                 <div id="gdn-filter" class="flex gap-1 flex-wrap">
                     <button class="filter-btn" data-filter="all" onclick="filterGDN('all')">הכל</button>
                     <button class="filter-btn" data-filter="rectangle" onclick="filterGDN('rectangle')">Rectangle</button>
@@ -402,13 +345,13 @@
 
     <!-- Export Overlay -->
     <div id="export-overlay" class="export-overlay">
-        <div class="bg-surface rounded-xl p-6 max-w-md w-full mx-4 text-center border border-border" style="box-shadow:0 4px 24px rgba(0,0,0,0.12)">
-            <h3 class="text-sm font-semibold mb-4">ייצוא תצוגה מקדימה</h3>
+        <div class="glass p-6 max-w-md w-full mx-4 text-center">
+            <h3 class="text-sm font-semibold mb-4 text-white">ייצוא תצוגה מקדימה</h3>
             <canvas id="export-canvas" class="hidden"></canvas>
-            <img id="export-img" class="max-w-full rounded-lg mb-4 border border-border">
+            <img id="export-img" class="max-w-full rounded-lg mb-4 border border-white/10">
             <div class="flex gap-3 justify-center">
-                <a id="export-download" download="ad-preview.png" class="px-5 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer">הורד PNG</a>
-                <button onclick="closeExport()" class="px-5 py-2 border border-border-input text-text-mid rounded-lg text-sm hover:bg-cream transition-colors">סגור</button>
+                <a id="export-download" download="ad-preview.png" class="px-5 py-2 bg-accent text-white rounded-full text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer">הורד PNG</a>
+                <button onclick="closeExport()" class="px-5 py-2 border border-white/20 text-white/60 rounded-full text-sm hover:bg-white/10 transition-colors">סגור</button>
             </div>
         </div>
     </div>
@@ -493,9 +436,9 @@ function switchTab(tab) {
         const isActive = b.dataset.tab === tab;
         const side = b.dataset.tab === 'facebook' ? 'l' : 'r';
         if (isActive) {
-            b.className = `tab-btn px-5 py-1.5 text-sm font-medium rounded-${side}-lg bg-text-primary text-white`;
+            b.className = `tab-btn px-5 py-1.5 text-sm font-medium rounded-${side}-full bg-accent text-white`;
         } else {
-            b.className = `tab-btn px-5 py-1.5 text-sm font-medium rounded-${side}-lg bg-surface text-text-mid border border-border hover:bg-cream`;
+            b.className = `tab-btn px-5 py-1.5 text-sm font-medium rounded-${side}-full bg-white/5 text-white/50 border border-white/10 hover:bg-white/10 hover:text-white/80`;
         }
     });
     document.getElementById('facebook-section').classList.toggle('hidden', tab !== 'facebook');
@@ -754,23 +697,23 @@ function renderPlacements() {
 
         const section = document.createElement('div');
         section.className = 'mb-4';
-        section.innerHTML = `<div class="text-base font-bold text-text-primary mb-2">${row.label}</div>`;
+        section.innerHTML = `<div class="text-base font-bold text-white/90 mb-2">${row.label}</div>`;
 
         const grid = document.createElement('div');
         grid.className = 'placement-row-scroll';
 
         visiblePlacements.forEach(p => {
             const card = document.createElement('div');
-            card.className = 'pair-card bg-surface rounded-lg overflow-hidden border border-border hover:border-border-input transition-colors';
+            card.className = 'pair-card glass overflow-hidden hover:border-white/20 transition-colors';
             card.id = 'card-' + p.id;
 
             const isFeed = p.mockup === 'feedCarousel';
             card.style.width = isFeed ? '280px' : '240px';
 
             card.innerHTML = `
-                <div class="flex items-center gap-1.5 px-2.5 py-1.5 border-b border-border-light">
+                <div class="flex items-center gap-1.5 px-2.5 py-1.5 border-b border-white/5">
                     ${getPlatformBadge(p.platform)}
-                    <span class="text-[10px] font-semibold text-text-primary">${p.name}</span>
+                    <span class="text-[10px] font-semibold text-white/80">${p.name}</span>
                 </div>
                 <div class="flex justify-center items-center p-1.5" id="body-${p.id}"></div>
             `;
@@ -790,7 +733,7 @@ function updateAllPreviews() {
 
         if (!hasMediaForPlacement(p)) {
             const label = p.ratio === 'carousel' ? 'העלה קרוסלה' : p.ratio === 'carouselSq' ? 'העלה תמונות פיד' : 'העלה מדיה';
-            body.innerHTML = `<span class="text-text-dim text-xs">${label}</span>`;
+            body.innerHTML = `<span class="text-white/30 text-xs">${label}</span>`;
             return;
         }
         let el;
@@ -1288,7 +1231,7 @@ function buildFeedCarouselMockup(p) {
 function renderGDNBadges() {
     document.getElementById('gdn-badges').innerHTML = gdnSizes.map(s => {
         const matched = state.gdnImages[`${s.w}x${s.h}`];
-        return `<span class="text-[10px] px-2 py-0.5 rounded ${matched ? 'bg-fn-green-bg text-fn-green' : 'bg-cream text-text-dim'}">${s.w}x${s.h}</span>`;
+        return `<span class="text-[10px] px-2 py-0.5 rounded ${matched ? 'bg-fn-green-bg text-fn-green' : 'bg-white/5 text-white/40'}">${s.w}x${s.h}</span>`;
     }).join('');
 }
 
@@ -1305,16 +1248,16 @@ function renderGDNGrid() {
         const ph = Math.round(s.h * scale);
 
         const card = document.createElement('div');
-        card.className = 'bg-surface rounded-lg border border-border p-3 flex flex-col items-center hover:border-border-input transition-colors';
+        card.className = 'glass p-3 flex flex-col items-center hover:border-white/20 transition-colors';
         card.dataset.cat = s.cat;
         card.innerHTML = `
             <div class="flex items-center gap-2 mb-2">
-                <span class="text-[12px] font-medium text-text-primary">${s.name}</span>
-                <span class="text-[10px] text-text-dim">${s.w}x${s.h}</span>
-                <span class="w-2 h-2 rounded-full ${hasImg ? 'bg-fn-green' : 'bg-border'}"></span>
+                <span class="text-[12px] font-medium text-white">${s.name}</span>
+                <span class="text-[10px] text-white/40">${s.w}x${s.h}</span>
+                <span class="w-2 h-2 rounded-full ${hasImg ? 'bg-fn-green' : 'bg-white/15'}"></span>
             </div>
             <div class="gdn-preview-container" style="width:${pw}px;height:${ph}px;">
-                ${hasImg ? '' : '<span class="absolute inset-0 flex items-center justify-center text-text-dim text-[9px]">אין תמונה</span>'}
+                ${hasImg ? '' : '<span class="absolute inset-0 flex items-center justify-center text-white/30 text-[9px]">אין תמונה</span>'}
             </div>
         `;
         if (hasImg) {
@@ -1367,9 +1310,9 @@ function filterGDN(cat) {
     document.querySelectorAll('.filter-btn').forEach(b => {
         const isActive = b.dataset.filter === cat;
         if (isActive) {
-            b.className = 'filter-btn px-3 py-1.5 text-[13px] rounded-lg bg-text-primary text-white font-medium';
+            b.className = 'filter-btn px-3 py-1.5 text-[13px] rounded-full bg-accent text-white font-medium';
         } else {
-            b.className = 'filter-btn px-3 py-1.5 text-[13px] rounded-lg bg-surface border border-border text-text-mid hover:bg-cream font-medium';
+            b.className = 'filter-btn px-3 py-1.5 text-[13px] rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white/80 font-medium';
         }
     });
     document.querySelectorAll('#gdn-grid > div').forEach(card => {
@@ -1544,7 +1487,7 @@ function adSlotHTML(slot, maxW, maxH) {
     if (src) {
         return `<img src="${src}" style="width:${w}px;height:${h}px;object-fit:cover;border-radius:2px;display:block;">`;
     }
-    return `<div style="width:${w}px;height:${h}px;background:#ddd;border:1px dashed #ccc;display:flex;align-items:center;justify-content:center;border-radius:2px;"><span style="color:#aaa;font-size:8px;text-align:center;">${slot.label}<br>${slot.size}</span></div>`;
+    return `<div style="width:${w}px;height:${h}px;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;border-radius:2px;"><span style="color:rgba(255,255,255,0.3);font-size:8px;text-align:center;">${slot.label}<br>${slot.size}</span></div>`;
 }
 
 function renderSiteMockups() {
@@ -1558,12 +1501,12 @@ function renderSiteMockups() {
     siteMockups.forEach(site => {
         const sl = site.slots;
         const card = document.createElement('div');
-        card.className = 'bg-surface rounded-xl border border-border overflow-hidden hover:border-border-input transition-colors';
+        card.className = 'glass overflow-hidden hover:border-white/20 transition-colors';
 
         card.innerHTML = `
-            <div class="flex items-center gap-2 px-3 py-2 border-b border-border-light text-[12px] font-medium text-text-mid">
-                <span class="font-semibold text-text-primary">${site.name}</span>
-                <span class="text-text-dim text-[10px]">${site.url}</span>
+            <div class="flex items-center gap-2 px-3 py-2 border-b border-white/5 text-[12px] font-medium text-white/60">
+                <span class="font-semibold text-white">${site.name}</span>
+                <span class="text-white/40 text-[10px]">${site.url}</span>
             </div>
             <div style="background:${site.bgColor};overflow:hidden;">
                 <!-- Header -->
