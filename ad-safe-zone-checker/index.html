@@ -7,6 +7,7 @@
     <!-- Tailwind CDN: kept for single-file simplicity. For production, consider a build step with PostCSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -34,16 +35,17 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             font-size: 14px; line-height: 1.5; color: #fff; min-height: 100vh;
         }
-        /* Layered gradient background simulating blurred room photo */
+        /* Blurred background image */
         body::before {
+            content: ''; position: fixed; inset: -20px; z-index: -1;
+            background: url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1920&q=80') center/cover no-repeat;
+            filter: blur(25px) brightness(0.35) saturate(1.2);
+            transform: scale(1.05);
+        }
+        /* Dark overlay for consistent readability */
+        body::after {
             content: ''; position: fixed; inset: 0; z-index: -1;
-            background:
-                radial-gradient(ellipse at 15% 30%, rgba(0, 80, 120, 0.35), transparent 55%),
-                radial-gradient(ellipse at 75% 15%, rgba(20, 60, 100, 0.4), transparent 50%),
-                radial-gradient(ellipse at 85% 70%, rgba(0, 70, 60, 0.3), transparent 55%),
-                radial-gradient(ellipse at 40% 80%, rgba(30, 50, 70, 0.25), transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(10, 30, 50, 0.2), transparent 70%),
-                linear-gradient(145deg, #0a1628 0%, #0f1b2d 30%, #1a1a2e 60%, #0d1b2a 100%);
+            background: rgba(10, 15, 30, 0.4);
         }
 
         /* Glass utility classes */
@@ -251,8 +253,8 @@
     <header class="glass-pill mx-4 mt-4 px-6 py-3 flex items-center justify-between">
         <h1 class="text-lg font-semibold text-white">בדיקת Safe Zone למודעות</h1>
         <div class="flex items-center gap-3">
-            <button id="export-img-btn" onclick="exportAsImage()" aria-label="ייצוא כתמונה" class="px-4 py-1.5 bg-accent text-white text-[12px] rounded-full font-medium hover:bg-blue-600 transition-colors hidden">
-                <span dir="ltr">PNG</span> ייצוא
+            <button id="export-img-btn" onclick="exportAsPDF()" aria-label="ייצוא PDF" class="px-4 py-1.5 bg-accent text-white text-[12px] rounded-full font-medium hover:bg-blue-600 transition-colors hidden">
+                <span dir="ltr">PDF</span> ייצוא
             </button>
             <div class="flex" dir="ltr">
                 <button class="tab-btn px-5 py-1.5 text-[13px] font-medium rounded-l-full" data-tab="facebook" onclick="switchTab('facebook')">
@@ -361,11 +363,10 @@
     <!-- Export Overlay -->
     <div id="export-overlay" class="export-overlay">
         <div class="glass p-6 max-w-md w-full mx-4 text-center">
-            <h3 class="text-sm font-semibold mb-4 text-white">ייצוא תצוגה מקדימה</h3>
-            <canvas id="export-canvas" class="hidden"></canvas>
-            <img id="export-img" class="max-w-full rounded-lg mb-4 border border-white/10">
+            <h3 class="text-sm font-semibold mb-4 text-white">ייצוא PDF</h3>
+            <p id="export-status" class="text-white/60 text-sm mb-4">מכין PDF...</p>
             <div class="flex gap-3 justify-center">
-                <a id="export-download" download="ad-preview.png" class="px-5 py-2 bg-accent text-white rounded-full text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer">הורד PNG</a>
+                <a id="export-download" download="ad-preview.pdf" class="px-5 py-2 bg-accent text-white rounded-full text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer hidden">הורד PDF</a>
                 <button onclick="closeExport()" class="px-5 py-2 border border-white/20 text-white/60 rounded-full text-sm hover:bg-white/10 transition-colors">סגור</button>
             </div>
         </div>
@@ -1368,19 +1369,24 @@ function filterGDN(cat) {
 // ============================================================
 // EXPORT
 // ============================================================
-function exportAsImage() {
+function exportAsPDF() {
     const isFB = !document.getElementById('facebook-section').classList.contains('hidden');
     const target = isFB ? document.getElementById('facebook-section') : document.getElementById('gdn-section');
 
     if (!target) { notify('אין תוכן לייצוא'); return; }
 
-    notify('מכין ייצוא PNG...');
+    const overlay = document.getElementById('export-overlay');
+    const statusEl = document.getElementById('export-status');
+    const downloadLink = document.getElementById('export-download');
+    downloadLink.classList.add('hidden');
+    statusEl.textContent = 'מכין PDF...';
+    overlay.classList.add('active');
 
     // Convert blob URLs to data URLs for html2canvas compatibility
     const blobImages = target.querySelectorAll('img[src^="blob:"], video[src^="blob:"]');
     const conversions = Array.from(blobImages).map(el => {
         return new Promise(resolve => {
-            if (el.tagName === 'VIDEO') { resolve(); return; } // skip videos
+            if (el.tagName === 'VIDEO') { resolve(); return; }
             const canvas = document.createElement('canvas');
             canvas.width = el.naturalWidth || el.width || 300;
             canvas.height = el.naturalHeight || el.height || 300;
@@ -1389,14 +1395,14 @@ function exportAsImage() {
             try {
                 el._originalSrc = el.src;
                 el.src = canvas.toDataURL('image/png');
-            } catch(e) { /* CORS - keep blob */ }
+            } catch(e) { /* CORS */ }
             resolve();
         });
     });
 
     Promise.all(conversions).then(() => {
         return html2canvas(target, {
-            backgroundColor: '#F5F4EF',
+            backgroundColor: '#0a1628',
             scale: 2,
             useCORS: true,
             allowTaint: true,
@@ -1405,29 +1411,41 @@ function exportAsImage() {
             scrollY: -window.scrollY,
         });
     }).then(canvas => {
-        // Restore original blob URLs
         blobImages.forEach(el => { if (el._originalSrc) { el.src = el._originalSrc; delete el._originalSrc; } });
 
-        const dataUrl = canvas.toDataURL('image/png');
-        const overlay = document.getElementById('export-overlay');
-        const img = document.getElementById('export-img');
-        const downloadLink = document.getElementById('export-download');
+        const imgData = canvas.toDataURL('image/jpeg', 0.92);
+        const imgW = canvas.width;
+        const imgH = canvas.height;
 
-        img.src = dataUrl;
-        downloadLink.href = dataUrl;
-        const timestamp = new Date().toISOString().slice(0,10);
-        downloadLink.download = `ad-preview-${isFB ? 'facebook' : 'gdn'}-${timestamp}.png`;
-        overlay.classList.add('active');
-        notify('הייצוא מוכן!');
+        // Create PDF in landscape or portrait based on aspect ratio
+        const { jsPDF } = window.jspdf;
+        const orientation = imgW > imgH ? 'landscape' : 'portrait';
+        const pdf = new jsPDF({ orientation, unit: 'px', format: [imgW / 2, imgH / 2] });
+
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgW / 2, imgH / 2);
+
+        const timestamp = new Date().toISOString().slice(0, 10);
+        const filename = `ad-preview-${isFB ? 'facebook' : 'gdn'}-${timestamp}.pdf`;
+
+        const pdfBlob = pdf.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        downloadLink.href = pdfUrl;
+        downloadLink.download = filename;
+        downloadLink.classList.remove('hidden');
+        statusEl.textContent = 'ה-PDF מוכן!';
+        notify('ה-PDF מוכן!');
     }).catch(err => {
-        // Restore blob URLs on error
         blobImages.forEach(el => { if (el._originalSrc) { el.src = el._originalSrc; delete el._originalSrc; } });
-        console.error('Export failed:', err);
-        notify('שגיאה בייצוא, מנסה הדפסה...');
-        setTimeout(() => window.print(), 300);
+        console.error('PDF export failed:', err);
+        statusEl.textContent = 'שגיאה בייצוא';
+        notify('שגיאה ביצירת PDF');
     });
 }
-function closeExport() { document.getElementById('export-overlay').classList.remove('active'); }
+function closeExport() {
+    document.getElementById('export-overlay').classList.remove('active');
+    document.getElementById('export-download').classList.add('hidden');
+}
 
 // ============================================================
 // NOTIFICATIONS
