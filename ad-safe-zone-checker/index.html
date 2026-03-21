@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת Safe Zone למודעות</title>
+    <!-- Tailwind CDN: kept for single-file simplicity. For production, consider a build step with PostCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#F5F4EF',
+                        surface: '#FFFFFF',
+                        border: { DEFAULT: '#E5E7EB', light: '#F0F0EC', input: '#D1D5DB' },
+                        accent: '#D97706',
+                        text: { primary: '#1A1A1A', mid: '#6B7280', dim: '#9CA3AF' },
+                        fn: {
+                            green: '#16A34A', 'green-bg': '#DCFCE7',
+                            red: '#EF4444', 'red-bg': '#FEE2E2',
+                            blue: '#3B82F6', 'blue-bg': '#DBEAFE',
+                        },
+                        fb: '#1877f2',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #1A1A1A; }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #F5F4EF; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+        /* Focus states - keyboard navigation */
+        :focus-visible { outline: 2px solid #D97706; outline-offset: 2px; border-radius: 4px; }
+        button:focus-visible, a:focus-visible { outline: 2px solid #D97706; outline-offset: 2px; }
+
+        /* Smooth transitions on interactive elements */
+        button, .upload-box, .tab-btn, .filter-btn, .toggle-track {
+            transition: all 0.15s ease;
+        }
+
+        /* Upload box states */
+        .upload-box:hover { border-color: #D97706; background: #FFFBEB; }
+        .upload-box.drag-over { border-color: #D97706 !important; background: #FFFBEB !important; }
+
+        .safe-zone-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; display: none; }
+        .safe-zone-overlay.active { display: block; }
+        .sz-danger {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.25);
+        }
+        .sz-line {
+            position: absolute;
+        }
+        .sz-line.horizontal {
+            height: 0; left: 0; right: 0;
+            border-top: 1.5px dashed rgba(0, 220, 130, 0.9);
+        }
+        .sz-line.vertical {
+            width: 0; top: 0; bottom: 0;
+            border-left: 1.5px dashed rgba(0, 220, 130, 0.9);
+        }
+        .sz-label {
+            position: absolute;
+            color: #00dc82;
+            font-size: 9px;
+            font-weight: 700;
+            white-space: nowrap;
+            direction: ltr;
+            text-align: center;
+            font-family: -apple-system, sans-serif;
+            background: rgba(0,0,0,0.65);
+            padding: 2px 6px;
+            border-radius: 4px;
+            line-height: 1;
+        }
+
+        .toggle-track {
+            width: 40px; height: 22px; border-radius: 11px;
+            background: #D1D5DB; position: relative; cursor: pointer; transition: background 0.2s;
+        }
+        .toggle-track.on { background: #3B82F6; }
+        .toggle-knob {
+            width: 16px; height: 16px; border-radius: 50%; background: white;
+            position: absolute; top: 3px; transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .toggle-track:not(.on) .toggle-knob { right: 3px; }
+        .toggle-track.on .toggle-knob { right: 21px; }
+
+        .mockup-media { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
+        .mockup-media-abs { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+
+        /* Carousel nav buttons */
+        .carousel-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 20px; height: 20px; border-radius: 50%;
+            background: rgba(255,255,255,0.85); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 25;
+            font-size: 10px; color: #333; line-height: 1;
+        }
+        .carousel-nav:hover { background: white; transform: translateY(-50%) scale(1.1); }
+        .carousel-nav:active { transform: translateY(-50%) scale(0.95); }
+        .carousel-nav.prev { left: 4px; }
+        .carousel-nav.next { right: 4px; }
+
+        /* Feed carousel mockup */
+        .feed-carousel-mockup {
+            width: 100%; max-width: 300px; background: #fff;
+            border-radius: 8px; overflow: hidden; border: 1px solid #E5E7EB;
+        }
+        .feed-carousel-track {
+            display: flex; gap: 3px;
+            overflow-x: auto; scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .feed-carousel-track::-webkit-scrollbar { display: none; }
+        .feed-carousel-slide {
+            flex: 0 0 78%; scroll-snap-align: start; position: relative;
+        }
+
+        .feed-mockup {
+            width: 100%; max-width: 320px; background: #fff;
+            border-radius: 8px; overflow: hidden; border: 1px solid #E5E7EB;
+        }
+
+        .vertical-mockup {
+            width: 190px; aspect-ratio: 9/16; border-radius: 10px;
+            overflow: hidden; position: relative; background: #000;
+        }
+
+        /* Phone frame */
+        .phone-frame {
+            position: relative;
+            width: 210px;
+            background: #f8f8f8;
+            border-radius: 26px;
+            padding: 6px;
+            border: 1px solid #ddd;
+        }
+        .phone-screen {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 9/19.5;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #000;
+        }
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 12px;
+            background: #000;
+            border-radius: 0 0 10px 10px;
+            z-index: 20;
+        }
+        .phone-status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 3px 8px 0;
+            z-index: 15;
+            font-size: 7px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .phone-home-indicator {
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 2px;
+            z-index: 20;
+        }
+        .phone-bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 24px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 8px 6px;
+            z-index: 15;
+        }
+        .phone-bottom-nav svg { opacity: 0.85; }
+
+        .gdn-preview-container { position: relative; background: #fff; overflow: hidden; border: 1px solid #E5E7EB; border-radius: 4px; }
+
+        .export-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100;
+            display: none; align-items: center; justify-content: center;
+        }
+        .export-overlay.active { display: flex; }
+
+        .tab-btn { transition: all 0.15s; }
+        .filter-btn { transition: all 0.15s; }
+
+        /* Placement rows - horizontal scroll */
+        .placement-row-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+        }
+        .placement-row-scroll::-webkit-scrollbar { display: none; }
+        .placement-row-scroll .pair-card {
+            flex: 0 0 auto;
+            scroll-snap-align: start;
+        }
+        /* Common mockup element styles */
+        .mockup-profile-pic { width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.3); flex-shrink: 0; }
+        .mockup-profile-pic-lg { width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+        .mockup-profile-pic-feed { width: 28px; height: 28px; border-radius: 50%; background: #e0e0e0; }
+        .mockup-username { color: white; font-size: 7px; font-weight: 600; }
+        .mockup-username-lg { color: white; font-size: 8px; font-weight: 600; }
+        .mockup-sponsored { color: rgba(255,255,255,0.5); font-size: 5px; }
+        .mockup-sponsored-lg { color: rgba(255,255,255,0.5); font-size: 7px; }
+        .mockup-close-icon { margin-left: 2px; }
+        .mockup-dots-icon { }
+        .mockup-overlay-abs { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+        .mockup-content-abs { position: absolute; inset: 0; overflow: hidden; }
+        .mockup-sz-abs { position: absolute; inset: 0; z-index: 8; }
+        .mockup-cta-btn { background: white; border-radius: 20px; padding: 5px 0; text-align: center; font-weight: 600; color: #333; display: flex; align-items: center; justify-content: center; gap: 3px; }
+        .mockup-cta-btn-sm { font-size: 7px; }
+        .mockup-cta-btn-md { font-size: 8px; }
+        .mockup-cta-btn-lg { font-size: 9px; }
+        .mockup-bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #000; }
+        .mockup-progress-bar { position: absolute; top: 20px; left: 6px; right: 6px; height: 1.5px; background: rgba(255,255,255,0.2); border-radius: 1px; }
+        .mockup-top-row { position: absolute; top: 25px; left: 6px; right: 6px; display: flex; align-items: center; gap: 4px; }
+        .mockup-side-actions { display: flex; flex-direction: column; gap: 5px; align-items: center; }
+        .mockup-action-count { color: white; font-size: 6px; font-weight: 600; }
+        .mockup-action-item { display: flex; flex-direction: column; align-items: center; gap: 0; }
+        .mockup-ad-label { color: rgba(255,255,255,0.4); font-size: 5px; }
+        .mockup-feed-header { display: flex; align-items: center; padding: 8px 10px; gap: 6px; }
+        .mockup-feed-username { font-size: 11px; font-weight: 600; color: #1a1a1a; }
+        .mockup-feed-sponsored { font-size: 9px; color: #999; }
+
+        /* Print styles for PDF export */
+        @media print {
+            body { background: white !important; }
+            header, .upload-box, .toggle-track, #export-img-btn, .carousel-nav, .filter-btn, #gdn-filter, .phone-notch { display: none !important; }
+            .placement-row-scroll { overflow: visible !important; flex-wrap: wrap !important; }
+            .pair-card { break-inside: avoid; }
+            @page { margin: 10mm; }
+        }
+
+        /* Responsive design */
+        @media (max-width: 640px) {
+            header { flex-direction: column; gap: 8px; padding: 10px 12px; }
+            header h1 { font-size: 15px; }
+            header .flex.items-center.gap-2 { width: 100%; justify-content: space-between; }
+            .tab-btn { font-size: 11px !important; padding: 6px 10px !important; }
+            #facebook-section { padding: 10px 8px; }
+            .upload-box { min-width: 0; flex: 1 1 120px; }
+            .placement-row-scroll { gap: 6px; }
+            .pair-card { min-width: 200px; }
+            #gdn-section { padding: 16px 10px; }
+            .filter-btn { font-size: 11px !important; padding: 4px 8px !important; }
+            #gdn-grid { gap: 8px; }
+            .export-overlay > div { margin: 8px; padding: 16px; }
+        }
+    </style>
+</head>
+<body class="bg-cream text-text-primary min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-surface border-b border-border px-6 py-3 flex items-center justify-between">
+        <h1 class="text-lg font-semibold">בדיקת Safe Zone למודעות</h1>
+        <div class="flex items-center gap-2">
+            <button id="export-img-btn" onclick="exportAsImage()" aria-label="ייצוא כתמונה" class="px-3 py-1.5 border border-border-input text-text-mid text-[12px] rounded-lg hover:bg-cream hover:text-text-primary transition-colors hidden">
+                <span dir="ltr">PNG</span> ייצוא
+            </button>
+            <div class="flex" dir="ltr">
+                <button class="tab-btn px-4 py-1.5 text-[13px] font-medium rounded-l-lg" data-tab="facebook" onclick="switchTab('facebook')">
+                    Facebook & Instagram
+                </button>
+                <button class="tab-btn px-4 py-1.5 text-[13px] font-medium rounded-r-lg" data-tab="gdn" onclick="switchTab('gdn')">
+                    Google Display Network
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 left-1/2 -translate-x-1/2 bg-surface border border-accent text-text-primary px-5 py-2.5 rounded-xl text-sm z-50 hidden" role="alert"></div>
+
+    <!-- ==================== FACEBOOK SECTION ==================== -->
+    <div id="facebook-section" class="mx-auto px-4 py-5" style="max-width:100%;">
+
+        <!-- Upload Area - compact inline -->
+        <div class="flex gap-2 mb-3 items-center flex-wrap">
+            <div class="upload-box flex items-center gap-2 bg-surface border border-dashed border-border-input rounded-lg px-3 py-2 cursor-pointer relative transition-all hover:border-accent"
+                 id="story-upload" onclick="document.getElementById('story-input').click()"
+                 ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'story')">
+                <button class="absolute top-1 left-1 w-4 h-4 text-text-dim rounded text-[10px] leading-none hidden z-20 hover:text-text-primary" onclick="event.stopPropagation(); clearMedia('story')" aria-label="Clear uploaded media">&times;</button>
+                <div id="story-icon"><svg class="text-text-dim" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div>
+                <div><div class="text-[12px] font-medium text-text-primary">תמונה בודדת</div><div class="text-[10px] text-text-dim">9:16</div></div>
+                <input type="file" id="story-input" accept="image/*,video/*" class="hidden" onchange="handleUpload(event, 'story')">
+                <div id="story-preview-container" class="hidden"><img class="w-6 h-8 object-cover rounded" /></div>
+            </div>
+
+            <div class="upload-box flex items-center gap-2 bg-surface border border-dashed border-border-input rounded-lg px-3 py-2 cursor-pointer relative transition-all hover:border-accent"
+                 id="carousel-upload" onclick="document.getElementById('carousel-input').click()"
+                 ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleCarouselDrop(event)">
+                <button class="absolute top-1 left-1 w-4 h-4 text-text-dim rounded text-[10px] leading-none hidden z-20 hover:text-text-primary" onclick="event.stopPropagation(); clearCarousel()" aria-label="Clear carousel images">&times;</button>
+                <div id="carousel-icon"><svg class="text-text-dim" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="13" height="18" rx="2"/><rect x="9" y="3" width="13" height="18" rx="2"/></svg></div>
+                <div><div class="text-[12px] font-medium text-text-primary">קרוסלה 9:16</div><div class="text-[10px] text-text-dim">2-10</div></div>
+                <input type="file" id="carousel-input" accept="image/*" multiple class="hidden" onchange="handleCarouselUpload(event)">
+                <div id="carousel-preview-container" class="hidden flex gap-0.5"></div>
+            </div>
+
+            <div class="upload-box flex items-center gap-2 bg-surface border border-dashed border-border-input rounded-lg px-3 py-2 cursor-pointer relative transition-all hover:border-accent"
+                 id="carousel-sq-upload" onclick="document.getElementById('carousel-sq-input').click()"
+                 ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleCarouselSqDrop(event)">
+                <button class="absolute top-1 left-1 w-4 h-4 text-text-dim rounded text-[10px] leading-none hidden z-20 hover:text-text-primary" onclick="event.stopPropagation(); clearCarouselSq()" aria-label="Clear feed carousel images">&times;</button>
+                <div id="carousel-sq-icon"><svg class="text-text-dim" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="16" rx="2"/><rect x="10" y="4" width="12" height="16" rx="2"/></svg></div>
+                <div><div class="text-[12px] font-medium text-text-primary">קרוסלה 1:1</div><div class="text-[10px] text-text-dim">2-10</div></div>
+                <input type="file" id="carousel-sq-input" accept="image/*" multiple class="hidden" onchange="handleCarouselSqUpload(event)">
+                <div id="carousel-sq-preview-container" class="hidden flex gap-0.5"></div>
+            </div>
+
+            <div class="flex items-center gap-2 mr-auto">
+                <div class="toggle-track on" id="sz-toggle" onclick="toggleSafeZones()" role="switch" aria-checked="true" aria-label="Toggle safe zones" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();toggleSafeZones();}">
+                    <div class="toggle-knob"></div>
+                </div>
+                <span class="text-[11px] text-text-dim">Safe Zones</span>
+            </div>
+        </div>
+
+
+        <!-- Placement Rows (horizontal scroll sections) -->
+        <div id="placements-container"></div>
+    </div>
+
+    <!-- ==================== GDN SECTION ==================== -->
+    <div id="gdn-section" class="max-w-[1400px] mx-auto px-6 py-7 hidden">
+
+        <div class="upload-box bg-surface border border-dashed border-border-input rounded-xl p-6 text-center cursor-pointer transition-all hover:border-accent mb-7"
+             onclick="document.getElementById('gdn-input').click()"
+             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleGDNDrop(event)">
+            <div class="mb-2">
+                <svg class="mx-auto text-text-dim" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+            </div>
+            <div class="text-sm font-medium text-text-primary mb-0.5">העלאת באנרים GDN</div>
+            <div class="text-xs text-text-dim mb-4">הגדלים מזוהים אוטומטית לפי רזולוציה או שם הקובץ</div>
+            <input type="file" id="gdn-input" accept="image/*" multiple class="hidden" onchange="handleGDNUpload(event)">
+            <div id="gdn-badges" class="flex flex-wrap gap-1.5 justify-center"></div>
+        </div>
+
+        <!-- Website Mockups Section (on top) -->
+        <div id="site-mockups-section" class="mb-8 hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-sm font-semibold text-text-primary">תצוגה באתרים</h2>
+                <span class="text-xs text-text-dim">איך המודעות נראות באתרי המפרסמים</span>
+            </div>
+            <div id="site-mockups-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- Size Grid -->
+        <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+                <h2 class="text-sm font-semibold text-text-primary">גדלים שהועלו</h2>
+                <div id="gdn-filter" class="flex gap-1 flex-wrap">
+                    <button class="filter-btn" data-filter="all" onclick="filterGDN('all')">הכל</button>
+                    <button class="filter-btn" data-filter="rectangle" onclick="filterGDN('rectangle')">Rectangle</button>
+                    <button class="filter-btn" data-filter="leaderboard" onclick="filterGDN('leaderboard')">Leaderboard</button>
+                    <button class="filter-btn" data-filter="skyscraper" onclick="filterGDN('skyscraper')">Skyscraper</button>
+                    <button class="filter-btn" data-filter="mobile" onclick="filterGDN('mobile')">Mobile</button>
+                </div>
+            </div>
+            <span class="text-xs text-text-dim" id="gdn-match-count"></span>
+        </div>
+
+        <div id="gdn-grid" class="flex flex-wrap gap-3 justify-center"></div>
+    </div>
+
+    <!-- Export Overlay -->
+    <div id="export-overlay" class="export-overlay">
+        <div class="bg-surface rounded-xl p-6 max-w-md w-full mx-4 text-center border border-border" style="box-shadow:0 4px 24px rgba(0,0,0,0.12)">
+            <h3 class="text-sm font-semibold mb-4">ייצוא תצוגה מקדימה</h3>
+            <canvas id="export-canvas" class="hidden"></canvas>
+            <img id="export-img" class="max-w-full rounded-lg mb-4 border border-border">
+            <div class="flex gap-3 justify-center">
+                <a id="export-download" download="ad-preview.png" class="px-5 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer">הורד PNG</a>
+                <button onclick="closeExport()" class="px-5 py-2 border border-border-input text-text-mid rounded-lg text-sm hover:bg-cream transition-colors">סגור</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ============================================================
+// UTILITIES
+// ============================================================
+function sanitize(str) {
+    const el = document.createElement('div');
+    el.textContent = str;
+    return el.innerHTML;
+}
+
+function revokeUrls(urls) {
+    if (Array.isArray(urls)) { urls.forEach(u => { if (u) URL.revokeObjectURL(u); }); }
+    else if (urls) { URL.revokeObjectURL(urls); }
+}
+
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+    square: null, squareType: null,
+    story: null, storyType: null,
+    carousel: [],    // 9:16 carousel images (stories/reels)
+    carouselSq: [],  // 1:1 carousel images (feed)
+    safeZones: true,
+    gdnSafeZones: true,
+    gdnImages: {},
+};
+
+// ============================================================
+// PLACEMENTS
+// ============================================================
+const placements = [
+    { id: 'ig-stories',       name: 'אינסטגרם סטורי',              platform: 'ig', mockup: 'story',         ratio: 'story' },
+    { id: 'fb-stories',       name: 'פייסבוק סטורי',              platform: 'fb', mockup: 'story',         ratio: 'story' },
+    { id: 'ig-reels',         name: 'אינסטגרם רילס',              platform: 'ig', mockup: 'reels',         ratio: 'story' },
+    { id: 'fb-reels',         name: 'פייסבוק רילס',               platform: 'fb', mockup: 'reels',         ratio: 'story' },
+    { id: 'ig-stories-car',   name: 'אינסטגרם קרוסלה סטורי',      platform: 'ig', mockup: 'storyCarousel', ratio: 'carousel' },
+    { id: 'fb-stories-car',   name: 'פייסבוק קרוסלה סטורי',       platform: 'fb', mockup: 'storyCarousel', ratio: 'carousel' },
+    { id: 'ig-reels-car',     name: 'אינסטגרם קרוסלה רילס',       platform: 'ig', mockup: 'reelsCarousel', ratio: 'carousel' },
+    { id: 'fb-reels-car',     name: 'פייסבוק קרוסלה רילס',        platform: 'fb', mockup: 'reelsCarousel', ratio: 'carousel' },
+    { id: 'ig-feed-car',      name: 'אינסטגרם קרוסלה פיד',        platform: 'ig', mockup: 'feedCarousel',  ratio: 'carouselSq' },
+    { id: 'fb-feed-car',      name: 'פייסבוק קרוסלה פיד',         platform: 'fb', mockup: 'feedCarousel',  ratio: 'carouselSq' },
+];
+
+// Safe zones only for vertical (9:16) placements per Meta 2026 unified guidelines
+// Square (1:1) placements don't need safe zones - the UI chrome is outside the image area
+// Pixel values based on 1080x1920 canvas
+const safeZoneSpecs = {
+    story:   { top: 14, bottom: 20, left: 0, right: 0, px: { top: 250, bottom: 340, left: 0, right: 0 },  labels: { top: 'UI / PROFILE', bottom: 'CTA' } },
+    reels:   { top: 11.5, bottom: 23.4, left: 3.2, right: 3.2, px: { top: 220, bottom: 450, left: 35, right: 35 }, labels: { top: 'UI OVERLAY', bottom: 'CTA / CAPTION', right: '' } },
+};
+
+const gdnSizes = [
+    { w: 300,  h: 250,  name: 'Medium Rectangle',   cat: 'rectangle' },
+    { w: 336,  h: 280,  name: 'Large Rectangle',    cat: 'rectangle' },
+    { w: 250,  h: 250,  name: 'Square',              cat: 'rectangle' },
+    { w: 200,  h: 200,  name: 'Small Square',        cat: 'rectangle' },
+    { w: 580,  h: 400,  name: 'Netboard',            cat: 'rectangle' },
+    { w: 728,  h: 90,   name: 'Leaderboard',         cat: 'leaderboard' },
+    { w: 970,  h: 90,   name: 'Large Leaderboard',   cat: 'leaderboard' },
+    { w: 970,  h: 250,  name: 'Billboard',           cat: 'leaderboard' },
+    { w: 468,  h: 60,   name: 'Banner',              cat: 'leaderboard' },
+    { w: 930,  h: 180,  name: 'Top Banner',          cat: 'leaderboard' },
+    { w: 980,  h: 120,  name: 'Panorama',            cat: 'leaderboard' },
+    { w: 320,  h: 100,  name: 'Large Mobile Banner', cat: 'mobile' },
+    { w: 300,  h: 600,  name: 'Half Page',           cat: 'skyscraper' },
+    { w: 160,  h: 600,  name: 'Wide Skyscraper',     cat: 'skyscraper' },
+    { w: 120,  h: 600,  name: 'Skyscraper',          cat: 'skyscraper' },
+    { w: 300,  h: 1050, name: 'Portrait',            cat: 'skyscraper' },
+    { w: 240,  h: 400,  name: 'Vertical Rectangle',  cat: 'skyscraper' },
+];
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        const isActive = b.dataset.tab === tab;
+        const side = b.dataset.tab === 'facebook' ? 'l' : 'r';
+        if (isActive) {
+            b.className = `tab-btn px-5 py-1.5 text-sm font-medium rounded-${side}-lg bg-text-primary text-white`;
+        } else {
+            b.className = `tab-btn px-5 py-1.5 text-sm font-medium rounded-${side}-lg bg-surface text-text-mid border border-border hover:bg-cream`;
+        }
+    });
+    document.getElementById('facebook-section').classList.toggle('hidden', tab !== 'facebook');
+    document.getElementById('gdn-section').classList.toggle('hidden', tab !== 'gdn');
+    updateExportBtn(tab);
+}
+
+// ============================================================
+// GENERIC CAROUSEL MANAGER (deduplicates story/carousel/carouselSq)
+// ============================================================
+const carouselConfigs = {
+    carousel:   { stateKey: 'carousel',   boxId: 'carousel-upload',    inputId: 'carousel-input',    iconId: 'carousel-icon',    containerId: 'carousel-preview-container',    thumbClass: 'w-10 h-14', showCount: true },
+    carouselSq: { stateKey: 'carouselSq', boxId: 'carousel-sq-upload', inputId: 'carousel-sq-input', iconId: 'carousel-sq-icon', containerId: 'carousel-sq-preview-container', thumbClass: 'w-8 h-8',   showCount: true },
+};
+
+function handleCarouselUploadGeneric(type, files) {
+    if (!files.length) return;
+    Array.from(files).forEach(f => {
+        if (f.type.startsWith('image/')) state[type].push(URL.createObjectURL(f));
+    });
+    updateCarouselPreviewGeneric(type);
+    renderPlacements();
+    updateAllPreviews();
+    document.getElementById('export-img-btn').classList.remove('hidden');
+}
+
+function clearCarouselGeneric(type) {
+    revokeUrls(state[type]);
+    state[type] = [];
+    updateCarouselPreviewGeneric(type);
+    renderPlacements();
+    updateAllPreviews();
+    updateExportBtn('facebook');
+}
+
+function updateCarouselPreviewGeneric(type) {
+    const cfg = carouselConfigs[type];
+    const box = document.getElementById(cfg.boxId);
+    const container = document.getElementById(cfg.containerId);
+    const icon = document.getElementById(cfg.iconId);
+    const btn = box.querySelector('button');
+    const items = state[cfg.stateKey];
+    if (items.length > 0) {
+        btn.classList.remove('hidden');
+        icon.classList.add('hidden');
+        container.classList.remove('hidden');
+        container.innerHTML = items.map(url =>
+            `<img src="${url}" class="${cfg.thumbClass} object-cover rounded" style="border:1px solid #E5E7EB;">`
+        ).join('') + (cfg.showCount ? `<span class="text-[10px] text-text-dim self-center">${items.length}</span>` : '');
+    } else {
+        btn.classList.add('hidden');
+        icon.classList.remove('hidden');
+        container.classList.add('hidden');
+        container.innerHTML = '';
+    }
+}
+
+// Wrappers for HTML onclick handlers
+function handleCarouselUpload(e) { handleCarouselUploadGeneric('carousel', e.target.files); }
+function handleCarouselDrop(e) { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); handleCarouselUploadGeneric('carousel', e.dataTransfer.files); }
+function clearCarousel() { clearCarouselGeneric('carousel'); }
+
+function handleCarouselSqUpload(e) { handleCarouselUploadGeneric('carouselSq', e.target.files); }
+function handleCarouselSqDrop(e) { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); handleCarouselUploadGeneric('carouselSq', e.dataTransfer.files); }
+function clearCarouselSq() { clearCarouselGeneric('carouselSq'); }
+
+function updateExportBtn(tab) {
+    const show = (tab === 'facebook' && (state.story || state.carousel.length >= 2 || state.carouselSq.length >= 2)) ||
+                 (tab === 'gdn' && Object.keys(state.gdnImages).length > 0);
+    document.getElementById('export-img-btn').classList.toggle('hidden', !show);
+}
+
+// ============================================================
+// DRAG & DROP
+// ============================================================
+function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function handleDrop(e, type) {
+    e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0], type);
+}
+function handleGDNDrop(e) {
+    e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+    processGDNFiles(e.dataTransfer.files);
+}
+
+// ============================================================
+// FILE UPLOAD
+// ============================================================
+function handleUpload(e, type) { if (e.target.files[0]) processFile(e.target.files[0], type); }
+
+function processFile(file, type) {
+    // Revoke previous blob URL to prevent memory leak
+    revokeUrls(state[type]);
+    const url = URL.createObjectURL(file);
+    const isVideo = file.type.startsWith('video/');
+    state[type] = url;
+    state[type + 'Type'] = isVideo ? 'video' : 'image';
+
+    const box = document.getElementById(type + '-upload');
+    box.querySelector('button').classList.remove('hidden');
+    document.getElementById(type + '-icon').classList.add('hidden');
+
+    const container = document.getElementById(type + '-preview-container');
+    container.innerHTML = '';
+    container.classList.remove('hidden');
+
+    const el = isVideo ? document.createElement('video') : document.createElement('img');
+    el.src = url;
+    el.className = 'max-w-full max-h-[140px] rounded-lg mx-auto';
+    if (isVideo) { el.muted = true; el.autoplay = true; el.loop = true; el.playsInline = true; }
+    container.appendChild(el);
+
+    document.getElementById('export-img-btn').classList.remove('hidden');
+    updateAllPreviews();
+}
+
+function clearMedia(type) {
+    revokeUrls(state[type]);
+    state[type] = null;
+    state[type + 'Type'] = null;
+    const box = document.getElementById(type + '-upload');
+    box.querySelector('button').classList.add('hidden');
+    document.getElementById(type + '-icon').classList.remove('hidden');
+    const container = document.getElementById(type + '-preview-container');
+    container.innerHTML = '';
+    container.classList.add('hidden');
+    document.getElementById(type + '-input').value = '';
+    updateExportBtn('facebook');
+    updateAllPreviews();
+}
+
+function createMediaEl(ratio) {
+    if (!state[ratio]) return null;
+    if (state[ratio + 'Type'] === 'video') {
+        const v = document.createElement('video');
+        v.src = state[ratio]; v.muted = true; v.autoplay = true; v.loop = true; v.playsInline = true;
+        return v;
+    }
+    const img = document.createElement('img');
+    img.src = state[ratio];
+    return img;
+}
+
+// ============================================================
+// SAFE ZONE OVERLAY
+// ============================================================
+function createSafeZoneOverlay(mockupType) {
+    const spec = safeZoneSpecs[mockupType];
+    if (!spec) return null;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'safe-zone-overlay' + (state.safeZones ? ' active' : '');
+
+    // Semi-transparent dark overlays on danger zones
+    addZone(overlay, `top:0;left:0;right:0;height:${spec.top}%;`);
+    addZone(overlay, `bottom:0;left:0;right:0;height:${spec.bottom}%;`);
+    if (spec.left > 0) addZone(overlay, `top:${spec.top}%;right:0;width:${spec.left}%;bottom:${spec.bottom}%;`);
+    if (spec.right > 0) addZone(overlay, `top:${spec.top}%;left:0;width:${spec.right}%;bottom:${spec.bottom}%;`);
+
+    // Dashed border lines at safe zone edges
+    addLine(overlay, 'horizontal', `top:${spec.top}%`);
+    addLine(overlay, 'horizontal', `bottom:${spec.bottom}%`);
+
+    // Pixel labels
+    addLabel(overlay, `${spec.px.top}px`, `top:${spec.top}%;left:50%;transform:translate(-50%,-120%);`);
+    addLabel(overlay, `${spec.px.bottom}px`, `bottom:${spec.bottom}%;left:50%;transform:translate(-50%,120%);`);
+
+    if (spec.left > 0) {
+        addLine(overlay, 'vertical', `right:${100 - spec.left}%`);
+        addLabel(overlay, `${spec.px.left}px`, `right:${100 - spec.left}%;top:50%;transform:translate(120%,-50%);font-size:7px;`);
+    }
+    if (spec.right > 0) {
+        addLine(overlay, 'vertical', `left:${100 - spec.right}%`);
+        addLabel(overlay, `${spec.px.right}px`, `left:${100 - spec.right}%;top:50%;transform:translate(-120%,-50%);font-size:7px;`);
+    }
+
+    return overlay;
+}
+
+function addZone(parent, style) {
+    const el = document.createElement('div');
+    el.className = 'sz-danger';
+    el.style.cssText = style;
+    parent.appendChild(el);
+}
+
+function addLine(parent, dir, style) {
+    const el = document.createElement('div');
+    el.className = 'sz-line ' + dir;
+    el.style.cssText = style;
+    parent.appendChild(el);
+}
+function addLabel(parent, text, style) {
+    const el = document.createElement('div');
+    el.className = 'sz-label';
+    el.textContent = text;
+    el.style.cssText = style;
+    parent.appendChild(el);
+}
+
+function toggleSafeZones() {
+    state.safeZones = !state.safeZones;
+    document.getElementById('sz-toggle').classList.toggle('on', state.safeZones);
+    document.querySelectorAll('#facebook-section .safe-zone-overlay').forEach(el => el.classList.toggle('active', state.safeZones));
+}
+
+// ============================================================
+// PLATFORM ICONS
+// ============================================================
+const platformIcons = {
+    fb: `<svg viewBox="0 0 24 24" fill="white" width="10" height="10"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,
+    ig: `<svg viewBox="0 0 24 24" fill="white" width="10" height="10"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>`,
+    threads: `<svg viewBox="0 0 24 24" fill="white" width="10" height="10"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.59 12c.025 3.086.718 5.496 2.057 7.164 1.432 1.781 3.632 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.288 3.27-.886 1.098-2.15 1.726-3.742 1.862-1.17.1-2.29-.092-3.238-.556-1.104-.54-1.864-1.39-2.199-2.463-.324-1.036-.24-2.146.236-3.126.722-1.486 2.26-2.524 4.337-2.924.987-.19 2.07-.215 3.164-.072-.087-.466-.217-.886-.396-1.253-.414-.852-1.093-1.322-2.024-1.398-1.543-.126-2.755.502-3.244 1.052l-1.4-1.462c.837-.88 2.55-1.678 4.56-1.512 1.512.124 2.66.838 3.41 2.12.575.985.886 2.203.95 3.72.573.17 1.093.398 1.556.685 1.138.706 1.96 1.668 2.44 2.862.772 1.92.757 4.776-1.558 7.048-1.862 1.826-4.143 2.622-7.384 2.649zM11.093 16.4c.759-.064 1.553-.38 2.09-1.044.387-.48.656-1.1.82-1.89-1.067-.16-2.1-.157-3.043.009-1.41.248-2.36.874-2.726 1.627-.218.449-.258.927-.112 1.396.177.567.6.98 1.226 1.28.586.283 1.24.389 1.745.389v.233z"/></svg>`,
+};
+
+function getPlatformBadge(platform) {
+    const styles = {
+        fb: 'background:#1877f2',
+        ig: 'background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)',
+        threads: 'background:#000'
+    };
+    return `<div class="w-[18px] h-[18px] rounded-full flex items-center justify-center flex-shrink-0" style="${styles[platform]}">${platformIcons[platform]}</div>`;
+}
+
+// ============================================================
+// RENDER PLACEMENTS
+// ============================================================
+// Placement rows: grouped by format, all items in one row
+const placementRows = [
+    { key: 'vertical', label: 'סטוריז ורילס', ids: ['ig-stories','fb-stories','ig-reels','fb-reels','ig-stories-car','fb-stories-car','ig-reels-car','fb-reels-car'] },
+
+    { key: 'feed',     label: 'פיד',           ids: ['ig-feed-car','fb-feed-car'] },
+];
+
+function hasMediaForPlacement(p) {
+    return p.ratio === 'carousel' ? state.carousel.length >= 2
+         : p.ratio === 'carouselSq' ? state.carouselSq.length >= 2
+         : !!state[p.ratio];
+}
+
+function getPlacement(id) { return placements.find(p => p.id === id); }
+
+function renderPlacements() {
+    const container = document.getElementById('placements-container');
+    container.innerHTML = '';
+
+    placementRows.forEach(row => {
+        const allPlacements = row.ids.map(getPlacement).filter(Boolean);
+        const visiblePlacements = allPlacements.filter(p => {
+            if (p.ratio === 'carousel') return state.carousel.length >= 2;
+            if (p.ratio === 'carouselSq') return state.carouselSq.length >= 2;
+            return true;
+        });
+        if (visiblePlacements.length === 0) return;
+
+        const section = document.createElement('div');
+        section.className = 'mb-4';
+        section.innerHTML = `<div class="text-base font-bold text-text-primary mb-2">${row.label}</div>`;
+
+        const grid = document.createElement('div');
+        grid.className = 'placement-row-scroll';
+
+        visiblePlacements.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'pair-card bg-surface rounded-lg overflow-hidden border border-border hover:border-border-input transition-colors';
+            card.id = 'card-' + p.id;
+
+            const isFeed = p.mockup === 'feedCarousel';
+            card.style.width = isFeed ? '280px' : '240px';
+
+            card.innerHTML = `
+                <div class="flex items-center gap-1.5 px-2.5 py-1.5 border-b border-border-light">
+                    ${getPlatformBadge(p.platform)}
+                    <span class="text-[10px] font-semibold text-text-primary">${p.name}</span>
+                </div>
+                <div class="flex justify-center items-center p-1.5" id="body-${p.id}"></div>
+            `;
+            grid.appendChild(card);
+        });
+
+        section.appendChild(grid);
+        container.appendChild(section);
+    });
+}
+
+function updateAllPreviews() {
+    placements.forEach(p => {
+        const body = document.getElementById('body-' + p.id);
+        if (!body) return;
+        body.innerHTML = '';
+
+        if (!hasMediaForPlacement(p)) {
+            const label = p.ratio === 'carousel' ? 'העלה קרוסלה' : p.ratio === 'carouselSq' ? 'העלה תמונות פיד' : 'העלה מדיה';
+            body.innerHTML = `<span class="text-text-dim text-xs">${label}</span>`;
+            return;
+        }
+        let el;
+        switch (p.mockup) {
+            case 'story':          el = buildStoryMockup(p); break;
+            case 'reels':          el = buildReelsMockup(p); break;
+            case 'storyCarousel':  el = buildStoryCarouselMockup(p); break;
+            case 'reelsCarousel':  el = buildReelsCarouselMockup(p); break;
+            case 'feedCarousel':   el = buildFeedCarouselMockup(p); break;
+        }
+        if (el) body.appendChild(el);
+    });
+}
+
+// ============================================================
+// STORY MOCKUP (phone frame) - FB & IG variants
+// ============================================================
+function buildStoryMockup(p) {
+    const isFB = p.platform === 'fb';
+    const phone = document.createElement('div');
+    phone.className = 'phone-frame';
+    phone.innerHTML = `
+        <div class="phone-screen">
+            <div class="phone-status-bar" dir="ltr"><span>3:36</span>${statusBarSVG}</div>
+            <div class="phone-notch"></div>
+            <div style="position:absolute;inset:0;overflow:hidden;" id="story-content-${p.id}"></div>
+            <div style="position:absolute;inset:0;z-index:5;pointer-events:none;" dir="ltr">
+                ${isFB ? `
+                <!-- FB Stories -->
+                <div style="position:absolute;top:20px;left:6px;right:6px;height:1.5px;background:rgba(255,255,255,0.2);border-radius:1px;">
+                    <div style="height:100%;width:35%;background:white;border-radius:1px;"></div>
+                </div>
+                <div style="position:absolute;top:25px;left:6px;right:6px;display:flex;align-items:center;gap:4px;">
+                    <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.3);flex-shrink:0;"></div>
+                    <div>
+                        <div style="color:white;font-size:7px;font-weight:600;">milega</div>
+                        <div style="color:rgba(255,255,255,0.5);font-size:5px;">Sponsored</div>
+                    </div>
+                    <div style="flex:1;"></div>
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="margin-left:2px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </div>
+                <div style="position:absolute;top:48px;left:6px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                </div>
+                <!-- Bottom dark bar with CTA -->
+                <div style="position:absolute;bottom:0;left:0;right:0;background:#000;padding:6px 10px 14px;text-align:center;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" style="margin-bottom:3px;"><polyline points="18 15 12 9 6 15"/></svg>
+                    <div style="background:white;border-radius:20px;padding:5px 0;text-align:center;font-size:8px;font-weight:700;color:#333;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:3px;">
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        LEARN MORE
+                    </div>
+                </div>
+                <!-- Social proof below story -->
+                <div style="position:absolute;bottom:4px;left:6px;">
+                    <span style="color:rgba(255,255,255,0.35);font-size:5px;">Micha follows milega.</span>
+                </div>
+                ` : `
+                <!-- IG Stories -->
+                <div style="position:absolute;top:20px;left:6px;right:6px;height:1.5px;background:rgba(255,255,255,0.2);border-radius:1px;">
+                    <div style="height:100%;width:100%;background:rgba(255,255,255,0.6);border-radius:1px;"></div>
+                </div>
+                <div style="position:absolute;top:25px;left:6px;right:6px;display:flex;align-items:center;gap:4px;">
+                    <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.3);flex-shrink:0;"></div>
+                    <span style="color:white;font-size:7px;font-weight:500;">milega</span>
+                    <div style="flex:1;"></div>
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="margin-left:2px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </div>
+                <!-- Bottom dark bar with CTA + icons -->
+                <div style="position:absolute;bottom:0;left:0;right:0;background:#000;">
+                    <!-- CTA area -->
+                    <div style="padding:5px 10px 4px;text-align:center;">
+                        <div style="background:white;border-radius:20px;padding:5px 0;text-align:center;font-size:7px;font-weight:600;color:#333;display:flex;align-items:center;justify-content:center;gap:3px;">
+                            <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            Learn more
+                        </div>
+                    </div>
+                    <!-- Ad + action icons -->
+                    <div style="padding:2px 8px 10px;display:flex;justify-content:space-between;align-items:center;">
+                        <span style="color:rgba(255,255,255,0.4);font-size:5px;">Ad</span>
+                        <div style="display:flex;gap:6px;">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        </div>
+                    </div>
+                </div>
+                `}
+            </div>
+            <div id="story-sz-${p.id}" style="position:absolute;inset:0;z-index:8;"></div>
+            <div class="phone-home-indicator"></div>
+        </div>`;
+    const contentArea = phone.querySelector(`#story-content-${p.id}`);
+    const media = createMediaEl(p.ratio);
+    if (media) { media.style.cssText = 'width:100%;height:100%;object-fit:contain;background:#000;'; contentArea.appendChild(media); }
+    const szContainer = phone.querySelector(`#story-sz-${p.id}`);
+    const sz = createSafeZoneOverlay('story');
+    if (sz) { sz.style.position = 'absolute'; sz.style.inset = '0'; szContainer.appendChild(sz); }
+    return phone;
+}
+
+// ============================================================
+// REELS MOCKUP (phone frame) - FB & IG variants
+// ============================================================
+function buildReelsMockup(p) {
+    const isFB = p.platform === 'fb';
+    const phone = document.createElement('div');
+    phone.className = 'phone-frame';
+    phone.innerHTML = `
+        <div class="phone-screen">
+            <div class="phone-status-bar" dir="ltr"><span>3:38</span>${statusBarSVG}</div>
+            <div class="phone-notch"></div>
+            <div style="position:absolute;inset:0;overflow:hidden;" id="reels-content-${p.id}"></div>
+            <div style="position:absolute;inset:0;z-index:5;pointer-events:none;" dir="ltr">
+                ${isFB ? `
+                <!-- FB Reels -->
+                <div style="position:absolute;top:20px;left:8px;display:flex;align-items:center;gap:4px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="0.5"><line x1="3" y1="6" x2="21" y2="6" stroke-width="2"/><line x1="3" y1="12" x2="21" y2="12" stroke-width="2"/><line x1="3" y1="18" x2="21" y2="18" stroke-width="2"/></svg>
+                    <span style="color:white;font-size:11px;font-weight:700;">Reels</span>
+                </div>
+                <div style="position:absolute;right:6px;bottom:70px;display:flex;flex-direction:column;gap:5px;align-items:center;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                        <span style="color:white;font-size:6px;font-weight:600;">633</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span style="color:white;font-size:6px;font-weight:600;">31</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                        <span style="color:white;font-size:6px;font-weight:600;">14</span>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                </div>
+                <div style="position:absolute;bottom:26px;left:0;right:30px;padding:0 8px;">
+                    <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
+                        <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.3);"></div>
+                        <span style="color:white;font-size:7px;font-weight:600;">milega</span>
+                    </div>
+                    <div style="color:white;font-size:6px;opacity:0.8;margin-bottom:3px;" dir="rtl">Cloud Touch... <span style="opacity:0.5;">more</span></div>
+                    <div style="background:white;border-radius:4px;padding:4px 0;text-align:center;font-size:7px;font-weight:600;color:#333;margin-bottom:3px;">Sign up</div>
+                    <div style="display:flex;align-items:center;gap:4px;">
+                        <div style="display:flex;align-items:center;gap:2px;">
+                            <svg width="6" height="6" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
+                            <span style="color:rgba(255,255,255,0.5);font-size:6px;">Sponsored</span>
+                        </div>
+                        <span style="color:rgba(255,255,255,0.4);font-size:5px;">Explore more</span>
+                    </div>
+                </div>
+                ` : `
+                <!-- IG Reels -->
+                <div style="position:absolute;right:6px;bottom:65px;display:flex;flex-direction:column;gap:5px;align-items:center;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span style="color:white;font-size:6px;font-weight:600;">3,407</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span style="color:white;font-size:6px;font-weight:600;">46</span>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        <span style="color:white;font-size:6px;font-weight:600;">2,125</span>
+                    </div>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                </div>
+                <div style="position:absolute;bottom:26px;left:0;right:28px;padding:0 8px;">
+                    <div style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,255,255,0.2);border-radius:4px;padding:3px 8px;margin-bottom:3px;">
+                        <span style="color:white;font-size:7px;font-weight:500;">Learn more</span>
+                        <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
+                        <div style="width:16px;height:16px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);padding:1px;">
+                            <div style="width:100%;height:100%;border-radius:50%;background:rgba(200,200,200,0.4);"></div>
+                        </div>
+                        <span style="color:white;font-size:7px;font-weight:600;">milega</span>
+                        <span style="color:white;font-size:5px;background:rgba(255,255,255,0.2);padding:1px 4px;border-radius:2px;font-weight:600;">Follow</span>
+                    </div>
+                    <div style="color:white;font-size:6px;opacity:0.8;margin-bottom:2px;">Cloud Touch... <span style="opacity:0.5;">more</span></div>
+                    <div style="color:rgba(255,255,255,0.45);font-size:5px;margin-bottom:1px;">325 posts tagged milega</div>
+                    <span style="color:rgba(255,255,255,0.4);font-size:5px;">Ad</span>
+                </div>
+                <div style="position:absolute;bottom:28px;right:6px;width:14px;height:14px;border-radius:3px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);"></div>
+                `}
+            </div>
+            <div id="reels-sz-${p.id}" style="position:absolute;inset:0;z-index:8;"></div>
+            ${isFB ? `
+            <div class="phone-bottom-nav" dir="ltr" style="height:26px;padding:1px 4px 5px;gap:0;">
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                    <span style="color:rgba(255,255,255,0.5);font-size:4px;">Home</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10,8 16,12 10,16" fill="black"/></svg>
+                    <span style="color:white;font-size:4px;font-weight:600;">Reels</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    <span style="color:rgba(255,255,255,0.5);font-size:4px;">Friends</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/></svg>
+                    <span style="color:rgba(255,255,255,0.5);font-size:4px;">Market</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;position:relative;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
+                    <div style="position:absolute;top:-1px;right:0;width:6px;height:6px;border-radius:50%;background:#E41E3F;font-size:3px;color:white;display:flex;align-items:center;justify-content:center;">4</div>
+                    <span style="color:rgba(255,255,255,0.5);font-size:4px;">Notif</span>
+                </div>
+                <div style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.25);"></div>
+            </div>` : `
+            <div class="phone-bottom-nav" dir="ltr" style="height:24px;padding:1px 8px 5px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10,8 16,12 10,16" fill="black"/></svg>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <div style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.25);"></div>
+            </div>`}
+            <div class="phone-home-indicator"></div>
+        </div>`;
+    const contentArea = phone.querySelector(`#reels-content-${p.id}`);
+    const media = createMediaEl(p.ratio);
+    if (media) { media.style.cssText = 'width:100%;height:100%;object-fit:contain;background:#000;'; contentArea.appendChild(media); }
+    const szContainer = phone.querySelector(`#reels-sz-${p.id}`);
+    const sz = createSafeZoneOverlay('reels');
+    if (sz) { sz.style.position = 'absolute'; sz.style.inset = '0'; szContainer.appendChild(sz); }
+    return phone;
+}
+
+// ============================================================
+// CAROUSEL NAVIGATION HELPER
+// ============================================================
+function carouselNav(mockupId, dir) {
+    const el = document.getElementById(mockupId);
+    if (!el) return;
+    let idx = parseInt(el.dataset.idx || '0');
+    const total = parseInt(el.dataset.total || '1');
+    idx = Math.max(0, Math.min(total - 1, idx + dir));
+    el.dataset.idx = idx;
+    // Update image
+    const img = el.querySelector('.carousel-active-img');
+    if (img) img.src = state.carousel[idx];
+    // Update dots
+    el.querySelectorAll('.car-dot').forEach((d, i) => {
+        d.style.background = i === idx ? 'white' : 'rgba(255,255,255,0.35)';
+        d.style.width = i === idx ? '10px' : '4px';
+    });
+    // Update progress bars (stories)
+    el.querySelectorAll('.car-progress').forEach((d, i) => {
+        d.style.background = i <= idx ? 'white' : 'rgba(255,255,255,0.25)';
+    });
+    // Update counter
+    const counter = el.querySelector('.car-counter');
+    if (counter) counter.textContent = `${idx + 1}/${total}`;
+}
+
+// Feed carousel - button click scrolls to next/prev card
+function feedCarouselBtn(mockupId, dir) {
+    const track = document.getElementById(mockupId + '-track');
+    if (!track) return;
+    const slide = track.querySelector('.feed-carousel-slide');
+    if (!slide) return;
+    const slideWidth = slide.offsetWidth + 3; // width + gap
+    track.scrollBy({ left: dir * slideWidth, behavior: 'smooth' });
+}
+
+// Feed carousel - update dots on scroll
+function feedCarouselOnScroll(mockupId) {
+    const track = document.getElementById(mockupId + '-track');
+    const el = document.getElementById(mockupId);
+    if (!track || !el) return;
+    const slide = track.querySelector('.feed-carousel-slide');
+    if (!slide) return;
+    const slideWidth = slide.offsetWidth + 3;
+    const idx = Math.round(track.scrollLeft / slideWidth);
+    el.dataset.idx = idx;
+    el.querySelectorAll('.car-dot').forEach((d, i) => {
+        d.style.background = i === idx ? '#3B82F6' : '#D1D5DB';
+    });
+}
+
+const statusBarSVG = `<span style="display:flex;gap:2px;align-items:center;">
+    <svg width="8" height="6" viewBox="0 0 16 12" fill="white"><rect x="0" y="6" width="3" height="6" rx="0.5"/><rect x="4.5" y="4" width="3" height="8" rx="0.5"/><rect x="9" y="1.5" width="3" height="10.5" rx="0.5"/><rect x="13" y="0" width="3" height="12" rx="0.5"/></svg>
+    <svg width="8" height="6" viewBox="0 0 16 12" fill="white"><path d="M8 2C5.5 2 3.2 3 1.5 4.7L0 3.2C2.1 1.2 4.9 0 8 0s5.9 1.2 8 3.2l-1.5 1.5C12.8 3 10.5 2 8 2zm0 4c-1.5 0-2.9.6-3.9 1.6L2.6 6.1C4 4.8 5.9 4 8 4s4 .8 5.4 2.1l-1.5 1.5C10.9 6.6 9.5 6 8 6zm0 4c-.8 0-1.6.3-2.1.9L8 13l2.1-2.1C9.6 10.3 8.8 10 8 10z"/></svg>
+    <svg width="14" height="7" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="2" stroke="white" stroke-width="1" fill="none"/><rect x="2" y="3" width="16" height="6" rx="1" fill="white"/><rect x="22" y="4" width="2" height="4" rx="0.5"/></svg>
+</span>`;
+
+const bottomNavSVG = `
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10,8 16,12 10,16" fill="black"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+// ============================================================
+// STORY CAROUSEL MOCKUP
+// ============================================================
+function buildStoryCarouselMockup(p) {
+    const mid = 'sc-' + p.id;
+    const imgs = state.carousel;
+    const total = imgs.length;
+
+    const dotsHTML = imgs.map((_, i) => `<div class="car-dot" style="width:${i===0?'10px':'4px'};height:4px;border-radius:2px;background:${i===0?'white':'rgba(255,255,255,0.35)'};transition:all 0.2s;"></div>`).join('');
+    const progressHTML = imgs.map((_, i) => `<div class="car-progress" style="flex:1;height:2px;background:${i===0?'white':'rgba(255,255,255,0.25)'};border-radius:2px;transition:background 0.2s;"></div>`).join('');
+
+    const phone = document.createElement('div');
+    phone.className = 'phone-frame';
+    phone.innerHTML = `
+        <div class="phone-screen" id="${mid}" data-idx="0" data-total="${total}">
+            <div class="phone-status-bar" dir="ltr"><span>9:41</span>${statusBarSVG}</div>
+            <div class="phone-notch"></div>
+            <div style="position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;">
+                <img src="${imgs[0]}" class="carousel-active-img" style="width:100%;height:100%;object-fit:contain;">
+            </div>
+            <!-- Nav buttons -->
+            <button class="carousel-nav prev" onclick="carouselNav('${mid}',-1)" dir="ltr">&lsaquo;</button>
+            <button class="carousel-nav next" onclick="carouselNav('${mid}',1)" dir="ltr">&rsaquo;</button>
+            <!-- UI -->
+            <div style="position:absolute;inset:0;z-index:15;pointer-events:none;" dir="ltr">
+                <div style="position:absolute;top:25px;left:6px;right:6px;display:flex;gap:2px;">${progressHTML}</div>
+                <div style="position:absolute;top:34px;left:8px;right:8px;display:flex;align-items:center;gap:5px;">
+                    <div style="width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.3);"></div>
+                    <span style="color:white;font-size:8px;font-weight:600;">milega</span>
+                    <span style="color:rgba(255,255,255,0.5);font-size:7px;">Sponsored</span>
+                    <div style="flex:1;"></div>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-left:3px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </div>
+                <div style="position:absolute;bottom:50px;left:50%;transform:translateX(-50%);display:flex;gap:3px;align-items:center;">${dotsHTML}</div>
+                <div style="position:absolute;bottom:26px;left:12px;right:12px;">
+                    <div style="background:white;border-radius:20px;padding:5px 0;text-align:center;font-size:9px;font-weight:600;color:#333;">Shop now</div>
+                </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+        </div>
+    `;
+    return phone;
+}
+
+// ============================================================
+// REELS CAROUSEL MOCKUP
+// ============================================================
+function buildReelsCarouselMockup(p) {
+    const mid = 'rc-' + p.id;
+    const imgs = state.carousel;
+    const total = imgs.length;
+
+    const dotsHTML = imgs.map((_, i) => `<div class="car-dot" style="width:${i===0?'10px':'4px'};height:4px;border-radius:2px;background:${i===0?'white':'rgba(255,255,255,0.35)'};transition:all 0.2s;"></div>`).join('');
+
+    const phone = document.createElement('div');
+    phone.className = 'phone-frame';
+    phone.innerHTML = `
+        <div class="phone-screen" id="${mid}" data-idx="0" data-total="${total}">
+            <div class="phone-status-bar" dir="ltr"><span>9:41</span>${statusBarSVG}</div>
+            <div class="phone-notch"></div>
+            <div style="position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;">
+                <img src="${imgs[0]}" class="carousel-active-img" style="width:100%;height:100%;object-fit:contain;">
+            </div>
+            <!-- Nav -->
+            <button class="carousel-nav prev" onclick="carouselNav('${mid}',-1)" dir="ltr">&lsaquo;</button>
+            <button class="carousel-nav next" onclick="carouselNav('${mid}',1)" dir="ltr">&rsaquo;</button>
+            <!-- Reels UI -->
+            <div style="position:absolute;inset:0;z-index:15;pointer-events:none;" dir="ltr">
+                <div style="position:absolute;top:25px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;">
+                    <span style="color:white;font-size:12px;font-weight:700;">Reels</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+                <div style="position:absolute;right:8px;bottom:80px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span style="color:white;font-size:7px;font-weight:600;">823k</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span style="color:white;font-size:7px;font-weight:600;">51</span>
+                    </div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                </div>
+                <div style="position:absolute;bottom:28px;left:0;right:40px;padding:0 10px;">
+                    <div style="display:flex;gap:3px;align-items:center;margin-bottom:6px;">${dotsHTML}</div>
+                    <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">
+                        <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.3);"></div>
+                        <span style="color:white;font-size:8px;font-weight:600;">milega</span>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(200,80,80,0.8);border-radius:6px;padding:5px 8px;margin-bottom:4px;">
+                        <span style="color:white;font-size:8px;font-weight:500;">Shop now</span>
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
+                    <div style="color:white;font-size:7px;opacity:0.7;">Sponsored</div>
+                </div>
+            </div>
+            <div class="phone-bottom-nav" dir="ltr">${bottomNavSVG}</div>
+            <div class="phone-home-indicator"></div>
+        </div>
+    `;
+    return phone;
+}
+
+// ============================================================
+// FEED CAROUSEL MOCKUP
+// ============================================================
+function buildFeedCarouselMockup(p) {
+    const mid = 'fc-' + p.id;
+    const imgs = state.carouselSq;
+    const total = imgs.length;
+    const isIG = p.platform === 'ig';
+
+    const slidesHTML = imgs.map((url, i) => `
+        <div class="feed-carousel-slide" style="border-radius:4px;overflow:hidden;border:1px solid #eee;">
+            <div style="aspect-ratio:1/1;overflow:hidden;background:#f0f0f0;">
+                <img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block;">
+            </div>
+            <div style="padding:6px 8px;background:#fff;" dir="rtl">
+                <div style="font-size:8px;color:#333;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">קולקציית המצעים Cloud Touch</div>
+                <div style="display:inline-block;padding:3px 10px;background:#E4E6EB;border-radius:4px;font-size:8px;font-weight:600;color:#333;">Order now</div>
+            </div>
+        </div>
+    `).join('');
+
+    const dotsHTML = imgs.map((_, i) => `<div class="car-dot" style="width:5px;height:5px;border-radius:50%;background:${i===0?'#3B82F6':'#D1D5DB'};transition:background 0.2s;"></div>`).join('');
+
+    const wrap = document.createElement('div');
+    wrap.className = 'feed-carousel-mockup';
+    wrap.innerHTML = `
+        <div id="${mid}" data-idx="0" data-total="${total}" style="position:relative;">
+            <!-- Header -->
+            <div style="display:flex;align-items:center;padding:8px 10px;gap:6px;" dir="ltr">
+                <div style="width:28px;height:28px;border-radius:50%;background:#e0e0e0;"></div>
+                <div style="flex:1;">
+                    <div style="font-size:11px;font-weight:600;color:#1a1a1a;">${isIG ? 'milega' : 'Milega מילגה'}</div>
+                    <div style="font-size:9px;color:#999;">${isIG ? 'Ad' : 'Sponsored'}</div>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+                ${!isIG ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" style="margin-left:4px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' : ''}
+            </div>
+            ${!isIG ? '<div style="padding:0 10px 6px;font-size:9px;color:#333;line-height:1.4;" dir="rtl">מוכנים לתחושת ריחוף? קולקציית המצעים Cloud Touch של מילגה... <span style="color:#999;">See more</span></div>' : ''}
+            <!-- Carousel track - native scroll with snap -->
+            <div style="position:relative;">
+                <div id="${mid}-track" class="feed-carousel-track" onscroll="feedCarouselOnScroll('${mid}')">
+                    ${slidesHTML}
+                </div>
+                <!-- Nav arrows -->
+                <button class="carousel-nav prev" onclick="feedCarouselBtn('${mid}',-1)" aria-label="Previous card" style="top:35%;">&lsaquo;</button>
+                <button class="carousel-nav next" onclick="feedCarouselBtn('${mid}',1)" aria-label="Next card" style="top:35%;">&rsaquo;</button>
+            </div>
+            ${isIG ? `
+            <!-- IG: Order now CTA row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-top:1px solid #eee;" dir="ltr">
+                <span style="font-size:10px;color:#333;">Order now</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <!-- Dots -->
+            <div style="display:flex;justify-content:center;gap:3px;padding:4px 0;" dir="ltr">${dotsHTML}</div>
+            <!-- Actions -->
+            <div style="display:flex;align-items:center;gap:10px;padding:4px 10px 6px;" dir="ltr">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <div style="flex:1;"></div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div style="padding:0 10px 6px;" dir="rtl">
+                <span style="font-size:9px;color:#333;"><b>milega</b> קולקציית המצעים Cloud Touch</span>
+            </div>
+            ` : `
+            <!-- FB: reactions + like/comment/share -->
+            <div style="padding:4px 10px;display:flex;align-items:center;gap:2px;border-top:1px solid #eee;" dir="ltr">
+                <div style="display:flex;">
+                    <span style="font-size:10px;">👍</span><span style="font-size:10px;margin-left:-2px;">😮</span><span style="font-size:10px;margin-left:-2px;">❤️</span>
+                </div>
+                <span style="font-size:9px;color:#666;margin-left:3px;">14</span>
+                <div style="flex:1;"></div>
+                <span style="font-size:9px;color:#666;">2K comments</span>
+            </div>
+            <div style="display:flex;gap:0;border-top:1px solid #eee;" dir="ltr">
+                <div style="flex:1;text-align:center;padding:6px 0;font-size:10px;color:#666;font-weight:500;">Like</div>
+                <div style="flex:1;text-align:center;padding:6px 0;font-size:10px;color:#666;font-weight:500;">Comment</div>
+                <div style="flex:1;text-align:center;padding:6px 0;font-size:10px;color:#666;font-weight:500;">Share</div>
+            </div>
+            `}
+        </div>
+    `;
+
+    return wrap;
+}
+
+// ============================================================
+// GDN
+// ============================================================
+function renderGDNBadges() {
+    document.getElementById('gdn-badges').innerHTML = gdnSizes.map(s => {
+        const matched = state.gdnImages[`${s.w}x${s.h}`];
+        return `<span class="text-[10px] px-2 py-0.5 rounded ${matched ? 'bg-fn-green-bg text-fn-green' : 'bg-cream text-text-dim'}">${s.w}x${s.h}</span>`;
+    }).join('');
+}
+
+function renderGDNGrid() {
+    const grid = document.getElementById('gdn-grid');
+    grid.innerHTML = '';
+    let matchCount = 0;
+    gdnSizes.forEach(s => {
+        const key = `${s.w}x${s.h}`;
+        const hasImg = state.gdnImages[key];
+        if (hasImg) matchCount++;
+        const scale = Math.min(280 / s.w, 200 / s.h, 1);
+        const pw = Math.round(s.w * scale);
+        const ph = Math.round(s.h * scale);
+
+        const card = document.createElement('div');
+        card.className = 'bg-surface rounded-lg border border-border p-3 flex flex-col items-center hover:border-border-input transition-colors';
+        card.dataset.cat = s.cat;
+        card.innerHTML = `
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-[12px] font-medium text-text-primary">${s.name}</span>
+                <span class="text-[10px] text-text-dim">${s.w}x${s.h}</span>
+                <span class="w-2 h-2 rounded-full ${hasImg ? 'bg-fn-green' : 'bg-border'}"></span>
+            </div>
+            <div class="gdn-preview-container" style="width:${pw}px;height:${ph}px;">
+                ${hasImg ? '' : '<span class="absolute inset-0 flex items-center justify-center text-text-dim text-[9px]">אין תמונה</span>'}
+            </div>
+        `;
+        if (hasImg) {
+            const prev = card.querySelector('.gdn-preview-container');
+            const img = document.createElement('img');
+            img.src = hasImg;
+            img.className = 'w-full h-full object-cover';
+            prev.innerHTML = '';
+            prev.appendChild(img);
+        }
+        grid.appendChild(card);
+    });
+    const countEl = document.getElementById('gdn-match-count');
+    if (countEl) countEl.textContent = `${matchCount}/${gdnSizes.length} matched`;
+}
+
+function handleGDNUpload(e) { processGDNFiles(e.target.files); }
+
+function processGDNFiles(files) {
+    if (!files.length) return;
+    let matched = 0, processed = 0;
+    const total = files.length;
+    Array.from(files).forEach(file => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            processed++;
+            let match = gdnSizes.find(s => s.w === img.naturalWidth && s.h === img.naturalHeight);
+            if (!match) {
+                const m = file.name.match(/(\d+)\s*[x\u00d7]\s*(\d+)/i);
+                if (m) match = gdnSizes.find(s => s.w === parseInt(m[1]) && s.h === parseInt(m[2]));
+            }
+            if (match) {
+                const key = `${match.w}x${match.h}`;
+                revokeUrls(state.gdnImages[key]); // revoke previous if re-uploading
+                state.gdnImages[key] = url;
+                matched++;
+            }
+            if (processed === total) {
+                renderGDNGrid(); renderGDNBadges(); renderSiteMockups();
+                document.getElementById('export-img-btn').classList.remove('hidden');
+                notify(`זוהו ${matched} מתוך ${total} תמונות`);
+            }
+        };
+        img.src = url;
+    });
+}
+
+function filterGDN(cat) {
+    document.querySelectorAll('.filter-btn').forEach(b => {
+        const isActive = b.dataset.filter === cat;
+        if (isActive) {
+            b.className = 'filter-btn px-3 py-1.5 text-[13px] rounded-lg bg-text-primary text-white font-medium';
+        } else {
+            b.className = 'filter-btn px-3 py-1.5 text-[13px] rounded-lg bg-surface border border-border text-text-mid hover:bg-cream font-medium';
+        }
+    });
+    document.querySelectorAll('#gdn-grid > div').forEach(card => {
+        card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
+    });
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+function exportAsImage() {
+    const isFB = !document.getElementById('facebook-section').classList.contains('hidden');
+    const target = isFB ? document.getElementById('facebook-section') : document.getElementById('gdn-section');
+
+    if (!target) { notify('אין תוכן לייצוא'); return; }
+
+    notify('מכין ייצוא PNG...');
+
+    // Convert blob URLs to data URLs for html2canvas compatibility
+    const blobImages = target.querySelectorAll('img[src^="blob:"], video[src^="blob:"]');
+    const conversions = Array.from(blobImages).map(el => {
+        return new Promise(resolve => {
+            if (el.tagName === 'VIDEO') { resolve(); return; } // skip videos
+            const canvas = document.createElement('canvas');
+            canvas.width = el.naturalWidth || el.width || 300;
+            canvas.height = el.naturalHeight || el.height || 300;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(el, 0, 0, canvas.width, canvas.height);
+            try {
+                el._originalSrc = el.src;
+                el.src = canvas.toDataURL('image/png');
+            } catch(e) { /* CORS - keep blob */ }
+            resolve();
+        });
+    });
+
+    Promise.all(conversions).then(() => {
+        return html2canvas(target, {
+            backgroundColor: '#F5F4EF',
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            scrollX: 0,
+            scrollY: -window.scrollY,
+        });
+    }).then(canvas => {
+        // Restore original blob URLs
+        blobImages.forEach(el => { if (el._originalSrc) { el.src = el._originalSrc; delete el._originalSrc; } });
+
+        const dataUrl = canvas.toDataURL('image/png');
+        const overlay = document.getElementById('export-overlay');
+        const img = document.getElementById('export-img');
+        const downloadLink = document.getElementById('export-download');
+
+        img.src = dataUrl;
+        downloadLink.href = dataUrl;
+        const timestamp = new Date().toISOString().slice(0,10);
+        downloadLink.download = `ad-preview-${isFB ? 'facebook' : 'gdn'}-${timestamp}.png`;
+        overlay.classList.add('active');
+        notify('הייצוא מוכן!');
+    }).catch(err => {
+        // Restore blob URLs on error
+        blobImages.forEach(el => { if (el._originalSrc) { el.src = el._originalSrc; delete el._originalSrc; } });
+        console.error('Export failed:', err);
+        notify('שגיאה בייצוא, מנסה הדפסה...');
+        setTimeout(() => window.print(), 300);
+    });
+}
+function closeExport() { document.getElementById('export-overlay').classList.remove('active'); }
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+function notify(text) {
+    const el = document.getElementById('notification');
+    el.textContent = text; // textContent is XSS-safe
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 3000);
+}
+
+// ============================================================
+// WEBSITE MOCKUPS
+// ============================================================
+const siteMockups = [
+    {
+        name: 'ynet',
+        url: 'ynet.co.il',
+        headerColor: '#DE1A1A',
+        headerText: 'ynet',
+        navItems: ['חדשות', 'כלכלה', 'ספורט', 'תרבות', 'בריאות'],
+        bgColor: '#f5f5f5',
+        slots: {
+            top: { size: '728x90', label: 'Leaderboard' },
+            sidebar: { size: '300x250', label: 'Medium Rectangle' },
+            sidebarTall: { size: '300x600', label: 'Half Page' },
+            inContent: { size: '468x60', label: 'Banner' },
+            mobileBanner: { size: '320x100', label: 'Mobile Banner' },
+        }
+    },
+    {
+        name: 'mako',
+        url: 'mako.co.il',
+        headerColor: '#273044',
+        headerText: 'mako',
+        navItems: ['חדשות', 'סלבס', 'אוכל', 'תרבות', 'ספורט'],
+        bgColor: '#f0f0f0',
+        slots: {
+            top: { size: '970x250', label: 'Billboard' },
+            sidebar: { size: '336x280', label: 'Large Rectangle' },
+            sidebarTall: { size: '160x600', label: 'Wide Skyscraper' },
+            inContent: { size: '300x250', label: 'Medium Rectangle' },
+            mobileBanner: { size: '320x100', label: 'Mobile Banner' },
+        }
+    },
+    {
+        name: 'walla!',
+        url: 'walla.co.il',
+        headerColor: '#363636',
+        headerText: 'walla!',
+        navItems: ['חדשות', 'ספורט', 'תרבות', 'כסף', 'טכנולוגיה'],
+        bgColor: '#eee',
+        slots: {
+            top: { size: '970x90', label: 'Large Leaderboard' },
+            sidebar: { size: '300x250', label: 'Medium Rectangle' },
+            sidebarTall: { size: '120x600', label: 'Skyscraper' },
+            inContent: { size: '728x90', label: 'Leaderboard' },
+            mobileBanner: { size: '320x100', label: 'Mobile Banner' },
+        }
+    },
+    {
+        name: 'N12',
+        url: 'n12.co.il',
+        headerColor: '#1a1a1a',
+        headerText: 'N12',
+        navItems: ['חדשות', 'ביטחוני', 'ספורט', 'כלכלה', 'תרבות'],
+        bgColor: '#f4f4f4',
+        slots: {
+            top: { size: '970x250', label: 'Billboard' },
+            sidebar: { size: '300x250', label: 'Medium Rectangle' },
+            sidebarTall: { size: '300x600', label: 'Half Page' },
+            inContent: { size: '728x90', label: 'Leaderboard' },
+            mobileBanner: { size: '320x100', label: 'Mobile Banner' },
+        }
+    },
+    {
+        name: 'Sport5',
+        url: 'sport5.co.il',
+        headerColor: '#0055a5',
+        headerText: 'SPORT5',
+        navItems: ['כדורגל', 'כדורסל', 'ספורט עולמי', 'רכב'],
+        bgColor: '#f2f2f2',
+        slots: {
+            top: { size: '728x90', label: 'Leaderboard' },
+            sidebar: { size: '300x250', label: 'Medium Rectangle' },
+            sidebarTall: { size: '240x400', label: 'Vertical Rectangle' },
+            inContent: { size: '468x60', label: 'Banner' },
+            mobileBanner: { size: '320x100', label: 'Mobile Banner' },
+        }
+    },
+];
+
+function parseSize(s) { const [w,h] = s.split('x').map(Number); return {w,h}; }
+
+function adSlotHTML(slot, maxW, maxH) {
+    if (!slot) return '';
+    const src = state.gdnImages[slot.size];
+    const s = parseSize(slot.size);
+    const scale = Math.min(maxW / s.w, maxH / s.h, 1);
+    const w = Math.round(s.w * scale);
+    const h = Math.round(s.h * scale);
+    if (src) {
+        return `<img src="${src}" style="width:${w}px;height:${h}px;object-fit:cover;border-radius:2px;display:block;">`;
+    }
+    return `<div style="width:${w}px;height:${h}px;background:#ddd;border:1px dashed #ccc;display:flex;align-items:center;justify-content:center;border-radius:2px;"><span style="color:#aaa;font-size:8px;text-align:center;">${slot.label}<br>${slot.size}</span></div>`;
+}
+
+function renderSiteMockups() {
+    const grid = document.getElementById('site-mockups-grid');
+    grid.innerHTML = '';
+
+    const hasAnyImage = Object.keys(state.gdnImages).length > 0;
+    document.getElementById('site-mockups-section').classList.toggle('hidden', !hasAnyImage);
+    if (!hasAnyImage) return;
+
+    siteMockups.forEach(site => {
+        const sl = site.slots;
+        const card = document.createElement('div');
+        card.className = 'bg-surface rounded-xl border border-border overflow-hidden hover:border-border-input transition-colors';
+
+        card.innerHTML = `
+            <div class="flex items-center gap-2 px-3 py-2 border-b border-border-light text-[12px] font-medium text-text-mid">
+                <span class="font-semibold text-text-primary">${site.name}</span>
+                <span class="text-text-dim text-[10px]">${site.url}</span>
+            </div>
+            <div style="background:${site.bgColor};overflow:hidden;">
+                <!-- Header -->
+                <div style="background:${site.headerColor};padding:5px 10px;display:flex;align-items:center;justify-content:space-between;" dir="ltr">
+                    <span style="color:white;font-weight:700;font-size:12px;">${site.headerText}</span>
+                    <div style="display:flex;gap:6px;">${site.navItems.map(n => `<span style="color:rgba(255,255,255,0.6);font-size:8px;">${n}</span>`).join('')}</div>
+                </div>
+
+                <!-- Top Banner -->
+                <div style="display:flex;justify-content:center;padding:4px 0;background:#e4e4e4;">
+                    ${adSlotHTML(sl.top, 420, 70)}
+                </div>
+
+                <!-- Content + Sidebar -->
+                <div style="display:flex;gap:6px;padding:6px 8px;" dir="rtl">
+                    <!-- Main Content -->
+                    <div style="flex:1;min-width:0;">
+                        <div style="background:#fff;border-radius:3px;padding:6px;margin-bottom:5px;">
+                            <div style="height:7px;width:75%;background:#ddd;border-radius:2px;margin-bottom:5px;"></div>
+                            <div style="height:5px;width:55%;background:#eee;border-radius:2px;margin-bottom:6px;"></div>
+                            <div style="height:45px;background:#f0f0f0;border-radius:2px;margin-bottom:5px;"></div>
+                            <div style="height:5px;width:85%;background:#eee;border-radius:2px;"></div>
+                        </div>
+                        <!-- In-content ad -->
+                        <div style="display:flex;justify-content:center;padding:3px 0;margin-bottom:5px;">
+                            ${adSlotHTML(sl.inContent, 260, 50)}
+                        </div>
+                        <div style="background:#fff;border-radius:3px;padding:6px;">
+                            <div style="height:6px;width:60%;background:#ddd;border-radius:2px;margin-bottom:5px;"></div>
+                            <div style="height:35px;background:#f0f0f0;border-radius:2px;margin-bottom:4px;"></div>
+                            <div style="height:5px;width:80%;background:#eee;border-radius:2px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div style="width:120px;flex-shrink:0;display:flex;flex-direction:column;gap:5px;align-items:center;">
+                        ${adSlotHTML(sl.sidebar, 120, 100)}
+                        ${adSlotHTML(sl.sidebarTall, 80, 140)}
+                    </div>
+                </div>
+
+                <!-- Mobile Banner (bottom) -->
+                <div style="display:flex;justify-content:center;padding:4px 0;background:#e8e8e8;border-top:1px solid #ddd;">
+                    ${adSlotHTML(sl.mobileBanner, 200, 40)}
+                </div>
+            </div>
+        `;
+
+        grid.appendChild(card);
+    });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderPlacements();
+renderGDNGrid();
+renderGDNBadges();
+renderSiteMockups();
+switchTab('facebook');
+filterGDN('all');
+</script>
+</body>
+</html>
