@@ -237,6 +237,22 @@
         /* Section titles */
         .section-title { color: rgba(255,255,255,0.9); font-weight: 600; }
 
+        /* Accessibility: respect reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .scroll-hint-arrow { animation: none !important; }
+        }
+
+        /* Ensure cursor-pointer on all interactive elements */
+        .tab-btn, .filter-btn, .carousel-nav, .scroll-hint-arrow,
+        .pair-card, button, a[href], [role="switch"] {
+            cursor: pointer;
+        }
+
         /* Export mode: replace glass/blur effects with solid backgrounds for html2canvas */
         body.export-mode .glass,
         body.export-mode .glass-pill,
