@@ -887,76 +887,77 @@ function buildReelsMockup(p) {
             <div style="position:absolute;inset:0;z-index:5;pointer-events:none;" dir="ltr">
                 ${isFB ? `
                 <!-- FB Reels -->
-                <div style="position:absolute;top:20px;left:8px;display:flex;align-items:center;gap:4px;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="0.5"><line x1="3" y1="6" x2="21" y2="6" stroke-width="2"/><line x1="3" y1="12" x2="21" y2="12" stroke-width="2"/><line x1="3" y1="18" x2="21" y2="18" stroke-width="2"/></svg>
-                    <span style="color:white;font-size:11px;font-weight:700;">Reels</span>
+                <!-- Header: hamburger + Reels -->
+                <div style="position:absolute;top:20px;left:8px;display:flex;align-items:center;gap:5px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><rect x="3" y="5" width="18" height="2" rx="1"/><rect x="3" y="11" width="18" height="2" rx="1"/><rect x="3" y="17" width="18" height="2" rx="1"/></svg>
+                    <span style="color:white;font-size:12px;font-weight:700;">Reels</span>
                 </div>
-                <div style="position:absolute;right:6px;bottom:70px;display:flex;flex-direction:column;gap:5px;align-items:center;">
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                <!-- Right side actions -->
+                <div style="position:absolute;right:6px;bottom:68px;display:flex;flex-direction:column;gap:8px;align-items:center;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
                         <span style="color:white;font-size:6px;font-weight:600;">633</span>
                     </div>
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                         <span style="color:white;font-size:6px;font-weight:600;">31</span>
                     </div>
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
                         <span style="color:white;font-size:6px;font-weight:600;">14</span>
                     </div>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                 </div>
-                <div style="position:absolute;bottom:26px;left:0;right:30px;padding:0 8px;">
+                <!-- Bottom left: profile + name + caption + CTA + sponsored -->
+                <div style="position:absolute;bottom:28px;left:0;right:28px;padding:0 8px;">
                     <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
-                        <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.3);"></div>
+                        <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.3);flex-shrink:0;"></div>
                         <span style="color:white;font-size:7px;font-weight:600;">milega</span>
+                        <svg width="7" height="7" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     </div>
-                    <div style="color:white;font-size:6px;opacity:0.8;margin-bottom:3px;" dir="rtl">Cloud Touch... <span style="opacity:0.5;">more</span></div>
-                    <div style="background:white;border-radius:4px;padding:4px 0;text-align:center;font-size:7px;font-weight:600;color:#333;margin-bottom:3px;">Sign up</div>
+                    <div style="color:white;font-size:6px;opacity:0.85;margin-bottom:4px;" dir="rtl">Cloud Touch... <span style="opacity:0.5;">more</span></div>
+                    <div style="background:white;border-radius:6px;padding:5px 0;text-align:center;font-size:8px;font-weight:600;color:#333;margin-bottom:4px;">Sign up</div>
                     <div style="display:flex;align-items:center;gap:4px;">
-                        <div style="display:flex;align-items:center;gap:2px;">
-                            <svg width="6" height="6" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
-                            <span style="color:rgba(255,255,255,0.5);font-size:6px;">Sponsored</span>
-                        </div>
-                        <span style="color:rgba(255,255,255,0.4);font-size:5px;">Explore more</span>
+                        <svg width="7" height="7" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                        <span style="color:rgba(255,255,255,0.5);font-size:5.5px;">Sponsored</span>
+                        <span style="color:rgba(255,255,255,0.35);font-size:5px;margin-left:4px;">▶ Explore more like this</span>
                     </div>
                 </div>
                 ` : `
-                <!-- IG Reels -->
-                <div style="position:absolute;right:6px;bottom:65px;display:flex;flex-direction:column;gap:5px;align-items:center;">
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <!-- IG Reels - no header, content edge to edge -->
+                <!-- Right side actions -->
+                <div style="position:absolute;right:6px;bottom:68px;display:flex;flex-direction:column;gap:8px;align-items:center;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                         <span style="color:white;font-size:6px;font-weight:600;">3,407</span>
                     </div>
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                         <span style="color:white;font-size:6px;font-weight:600;">46</span>
                     </div>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                         <span style="color:white;font-size:6px;font-weight:600;">2,125</span>
                     </div>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                 </div>
-                <div style="position:absolute;bottom:26px;left:0;right:28px;padding:0 8px;">
-                    <div style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,255,255,0.2);border-radius:4px;padding:3px 8px;margin-bottom:3px;">
-                        <span style="color:white;font-size:7px;font-weight:500;">Learn more</span>
-                        <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-                    </div>
+                <!-- Bottom left: profile with IG gradient ring + name + Follow + caption -->
+                <div style="position:absolute;bottom:28px;left:0;right:28px;padding:0 8px;">
                     <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
-                        <div style="width:16px;height:16px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);padding:1px;">
+                        <div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);padding:1.5px;flex-shrink:0;">
                             <div style="width:100%;height:100%;border-radius:50%;background:rgba(200,200,200,0.4);"></div>
                         </div>
                         <span style="color:white;font-size:7px;font-weight:600;">milega</span>
-                        <span style="color:white;font-size:5px;background:rgba(255,255,255,0.2);padding:1px 4px;border-radius:2px;font-weight:600;">Follow</span>
+                        <span style="color:white;font-size:5px;background:rgba(255,255,255,0.2);padding:2px 5px;border-radius:3px;font-weight:600;">Follow</span>
                     </div>
-                    <div style="color:white;font-size:6px;opacity:0.8;margin-bottom:2px;">Cloud Touch... <span style="opacity:0.5;">more</span></div>
-                    <div style="color:rgba(255,255,255,0.45);font-size:5px;margin-bottom:1px;">325 posts tagged milega</div>
-                    <span style="color:rgba(255,255,255,0.4);font-size:5px;">Ad</span>
+                    <div style="color:white;font-size:6px;opacity:0.85;margin-bottom:2px;">Cloud Touch... <span style="opacity:0.5;">more</span></div>
+                    <div style="color:rgba(255,255,255,0.4);font-size:5px;margin-bottom:1px;">325 posts tagged milega</div>
+                    <span style="color:rgba(255,255,255,0.35);font-size:5px;">Ad</span>
                 </div>
-                <div style="position:absolute;bottom:28px;right:6px;width:14px;height:14px;border-radius:3px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);"></div>
+                <!-- Music/album thumbnail bottom right -->
+                <div style="position:absolute;bottom:30px;right:6px;width:16px;height:16px;border-radius:3px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);"></div>
                 `}
             </div>
             <div id="reels-sz-${p.id}" style="position:absolute;inset:0;z-index:8;"></div>
@@ -986,11 +987,11 @@ function buildReelsMockup(p) {
                 <div style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.25);"></div>
             </div>` : `
             <div class="phone-bottom-nav" dir="ltr" style="height:24px;padding:1px 8px 5px;">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10,8 16,12 10,16" fill="black"/></svg>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <div style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.25);"></div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10,8 16,12 10,16" fill="black"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <div style="width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,0.25);"></div>
             </div>`}
             <div class="phone-home-indicator"></div>
         </div>`;
