@@ -763,62 +763,64 @@ function buildStoryMockup(p) {
             <div style="position:absolute;inset:0;z-index:5;pointer-events:none;" dir="ltr">
                 ${isFB ? `
                 <!-- FB Stories -->
-                <div style="position:absolute;top:20px;left:6px;right:6px;height:1.5px;background:rgba(255,255,255,0.2);border-radius:1px;">
-                    <div style="height:100%;width:35%;background:white;border-radius:1px;"></div>
+                <!-- Progress bar segments -->
+                <div style="position:absolute;top:20px;left:6px;right:6px;display:flex;gap:2px;">
+                    <div style="flex:1;height:1.5px;background:white;border-radius:1px;"></div>
+                    <div style="flex:1;height:1.5px;background:rgba(255,255,255,0.25);border-radius:1px;"></div>
+                    <div style="flex:1;height:1.5px;background:rgba(255,255,255,0.25);border-radius:1px;"></div>
                 </div>
-                <div style="position:absolute;top:25px;left:6px;right:6px;display:flex;align-items:center;gap:4px;">
-                    <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.3);flex-shrink:0;"></div>
-                    <div>
+                <!-- Profile row -->
+                <div style="position:absolute;top:26px;left:6px;right:6px;display:flex;align-items:center;gap:4px;">
+                    <div style="width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.3);flex-shrink:0;"></div>
+                    <div style="flex:1;min-width:0;">
                         <div style="color:white;font-size:7px;font-weight:600;">milega</div>
                         <div style="color:rgba(255,255,255,0.5);font-size:5px;">Sponsored</div>
                     </div>
-                    <div style="flex:1;"></div>
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="margin-left:2px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-left:3px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </div>
-                <div style="position:absolute;top:48px;left:6px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                </div>
-                <!-- Bottom dark bar with CTA -->
-                <div style="position:absolute;bottom:0;left:0;right:0;background:#000;padding:6px 10px 14px;text-align:center;">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" style="margin-bottom:3px;"><polyline points="18 15 12 9 6 15"/></svg>
-                    <div style="background:white;border-radius:20px;padding:5px 0;text-align:center;font-size:8px;font-weight:700;color:#333;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:3px;">
-                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <!-- Bottom: CTA bar -->
+                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,0.7) 30%, #000 60%);padding:12px 10px 6px;text-align:center;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" style="margin-bottom:4px;"><polyline points="18 15 12 9 6 15"/></svg>
+                    <div style="background:white;border-radius:20px;padding:6px 0;text-align:center;font-size:8px;font-weight:800;color:#333;letter-spacing:0.5px;display:flex;align-items:center;justify-content:center;gap:4px;">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                         LEARN MORE
                     </div>
                 </div>
-                <!-- Social proof below story -->
-                <div style="position:absolute;bottom:4px;left:6px;">
-                    <span style="color:rgba(255,255,255,0.35);font-size:5px;">Micha follows milega.</span>
+                <!-- Social proof below CTA -->
+                <div style="position:absolute;bottom:2px;left:6px;right:6px;text-align:center;">
+                    <span style="color:rgba(255,255,255,0.35);font-size:4.5px;">Micha Feller follows milega.</span>
                 </div>
                 ` : `
                 <!-- IG Stories -->
+                <!-- Progress bar (single segment, full) -->
                 <div style="position:absolute;top:20px;left:6px;right:6px;height:1.5px;background:rgba(255,255,255,0.2);border-radius:1px;">
-                    <div style="height:100%;width:100%;background:rgba(255,255,255,0.6);border-radius:1px;"></div>
+                    <div style="height:100%;width:100%;background:rgba(255,255,255,0.7);border-radius:1px;"></div>
                 </div>
-                <div style="position:absolute;top:25px;left:6px;right:6px;display:flex;align-items:center;gap:4px;">
-                    <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.3);flex-shrink:0;"></div>
+                <!-- Profile row -->
+                <div style="position:absolute;top:26px;left:6px;right:6px;display:flex;align-items:center;gap:4px;">
+                    <div style="width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.3);flex-shrink:0;"></div>
                     <span style="color:white;font-size:7px;font-weight:500;">milega</span>
                     <div style="flex:1;"></div>
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="margin-left:2px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-left:3px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </div>
-                <!-- Bottom dark bar with CTA + icons -->
-                <div style="position:absolute;bottom:0;left:0;right:0;background:#000;">
-                    <!-- CTA area -->
-                    <div style="padding:5px 10px 4px;text-align:center;">
-                        <div style="background:white;border-radius:20px;padding:5px 0;text-align:center;font-size:7px;font-weight:600;color:#333;display:flex;align-items:center;justify-content:center;gap:3px;">
-                            <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <!-- Bottom: gradient fade + CTA + action icons -->
+                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.85));">
+                    <!-- CTA pill -->
+                    <div style="padding:12px 14px 5px;text-align:center;">
+                        <div style="background:white;border-radius:20px;padding:6px 0;text-align:center;font-size:7px;font-weight:600;color:#333;display:flex;align-items:center;justify-content:center;gap:3px;">
+                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                             Learn more
                         </div>
                     </div>
-                    <!-- Ad + action icons -->
-                    <div style="padding:2px 8px 10px;display:flex;justify-content:space-between;align-items:center;">
+                    <!-- Ad label + action icons row -->
+                    <div style="padding:3px 8px 8px;display:flex;justify-content:space-between;align-items:center;">
                         <span style="color:rgba(255,255,255,0.4);font-size:5px;">Ad</span>
-                        <div style="display:flex;gap:6px;">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        <div style="display:flex;gap:8px;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                         </div>
                     </div>
                 </div>
