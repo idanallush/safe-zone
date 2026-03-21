@@ -237,6 +237,20 @@
         /* Section titles */
         .section-title { color: rgba(255,255,255,0.9); font-weight: 600; }
 
+        /* Export mode: replace glass/blur effects with solid backgrounds for html2canvas */
+        body.export-mode .glass,
+        body.export-mode .glass-pill,
+        body.export-mode .glass-subtle {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        body.export-mode .glass { background: rgba(15, 20, 40, 0.95) !important; }
+        body.export-mode .glass-pill { background: rgba(15, 20, 40, 0.95) !important; }
+        body.export-mode .glass-subtle { background: rgba(25, 30, 50, 0.9) !important; }
+        body.export-mode .scroll-hint { display: none !important; }
+        body.export-mode .placement-row-scroll { overflow: visible !important; flex-wrap: wrap !important; gap: 12px !important; }
+        body.export-mode #export-img-btn { display: none !important; }
+
         /* Print styles */
         @media print {
             body { background: #111 !important; }
@@ -1399,7 +1413,7 @@ function filterGDN(cat) {
 // ============================================================
 // EXPORT
 // ============================================================
-function exportAsPDF() {
+async function exportAsPDF() {
     const isFB = !document.getElementById('facebook-section').classList.contains('hidden');
     const target = isFB ? document.getElementById('facebook-section') : document.getElementById('gdn-section');
 
@@ -1430,29 +1444,45 @@ function exportAsPDF() {
         });
     });
 
+    // Enter export mode: solid backgrounds instead of glass blur
+    document.body.classList.add('export-mode');
+    // Scroll to top to capture everything
+    const prevScroll = window.scrollY;
+    window.scrollTo(0, 0);
+
+    // Small delay to let CSS apply
+    await new Promise(r => setTimeout(r, 100));
+
     Promise.all(conversions).then(() => {
         return html2canvas(target, {
-            backgroundColor: '#0a1628',
+            backgroundColor: '#0c1525',
             scale: 2,
             useCORS: true,
             allowTaint: true,
             logging: false,
             scrollX: 0,
-            scrollY: -window.scrollY,
+            scrollY: 0,
+            windowWidth: target.scrollWidth,
+            windowHeight: target.scrollHeight,
         });
     }).then(canvas => {
+        // Exit export mode
+        document.body.classList.remove('export-mode');
+        window.scrollTo(0, prevScroll);
         blobImages.forEach(el => { if (el._originalSrc) { el.src = el._originalSrc; delete el._originalSrc; } });
 
-        const imgData = canvas.toDataURL('image/jpeg', 0.92);
+        const imgData = canvas.toDataURL('image/png');
         const imgW = canvas.width;
         const imgH = canvas.height;
 
-        // Create PDF in landscape or portrait based on aspect ratio
+        // Create PDF — use mm for proper sizing, A4 landscape
         const { jsPDF } = window.jspdf;
-        const orientation = imgW > imgH ? 'landscape' : 'portrait';
-        const pdf = new jsPDF({ orientation, unit: 'px', format: [imgW / 2, imgH / 2] });
+        const pdfW = imgW / 2;
+        const pdfH = imgH / 2;
+        const orientation = pdfW > pdfH ? 'landscape' : 'portrait';
+        const pdf = new jsPDF({ orientation, unit: 'px', format: [pdfW, pdfH], compress: true });
 
-        pdf.addImage(imgData, 'JPEG', 0, 0, imgW / 2, imgH / 2);
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
 
         const timestamp = new Date().toISOString().slice(0, 10);
         const filename = `ad-preview-${isFB ? 'facebook' : 'gdn'}-${timestamp}.pdf`;
@@ -1466,6 +1496,8 @@ function exportAsPDF() {
         statusEl.textContent = 'ה-PDF מוכן!';
         notify('ה-PDF מוכן!');
     }).catch(err => {
+        document.body.classList.remove('export-mode');
+        window.scrollTo(0, prevScroll);
         blobImages.forEach(el => { if (el._originalSrc) { el.src = el._originalSrc; delete el._originalSrc; } });
         console.error('PDF export failed:', err);
         statusEl.textContent = 'שגיאה בייצוא';
