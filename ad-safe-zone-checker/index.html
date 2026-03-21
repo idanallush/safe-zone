@@ -202,20 +202,37 @@
         }
         .placement-row-scroll::-webkit-scrollbar { display: none; }
         .placement-row-scroll .pair-card { flex: 0 0 auto; scroll-snap-align: start; }
-        /* Scroll fade hint on left edge */
-        .scroll-fade {
-            position: absolute; top: 0; left: 0; bottom: 2px; width: 48px; z-index: 5;
-            background: linear-gradient(to right, rgba(10,22,40,0.85) 0%, transparent 100%);
+        /* Scroll hint arrows — RTL: "more" is to the LEFT */
+        .scroll-hint {
+            position: absolute; top: 0; bottom: 2px; width: 52px; z-index: 5;
             pointer-events: none; display: flex; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s;
+            transition: opacity 0.3s;
         }
-        .scroll-fade.visible { opacity: 1; }
-        .scroll-fade-arrow {
-            width: 20px; height: 20px; border-radius: 50%;
-            background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center;
-            pointer-events: auto; cursor: pointer;
+        .scroll-hint-left {
+            left: 0;
+            background: linear-gradient(to right, rgba(5,10,25,0.9) 0%, rgba(5,10,25,0.5) 50%, transparent 100%);
+            opacity: 1;
         }
-        .scroll-fade-arrow svg { opacity: 0.6; }
+        .scroll-hint-right {
+            right: 0;
+            background: linear-gradient(to left, rgba(5,10,25,0.9) 0%, rgba(5,10,25,0.5) 50%, transparent 100%);
+            opacity: 0;
+        }
+        .scroll-hint.hidden { opacity: 0; }
+        .scroll-hint.visible { opacity: 1; }
+        .scroll-hint-arrow {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;
+            pointer-events: auto; cursor: pointer; backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.15);
+            animation: pulse-hint 2s ease-in-out infinite;
+        }
+        .scroll-hint-arrow:hover { background: rgba(255,255,255,0.35); animation: none; }
+        .scroll-hint-arrow svg { opacity: 0.9; }
+        @keyframes pulse-hint {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.15); }
+            50% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(255,255,255,0); }
+        }
 
         /* Section titles */
         .section-title { color: rgba(255,255,255,0.9); font-weight: 600; }
@@ -741,21 +758,34 @@ function renderPlacements() {
             grid.appendChild(card);
         });
 
-        // Scroll fade indicator
-        const fade = document.createElement('div');
-        fade.className = 'scroll-fade';
-        fade.id = 'fade-' + row.key;
-        fade.innerHTML = `<div class="scroll-fade-arrow" onclick="document.getElementById('${scrollId}').scrollBy({left:-200,behavior:'smooth'})"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>`;
+        // Scroll hint arrows (RTL-aware)
+        const hintLeft = document.createElement('div');
+        hintLeft.className = 'scroll-hint scroll-hint-left';
+        hintLeft.innerHTML = `<div class="scroll-hint-arrow" onclick="document.getElementById('${scrollId}').scrollBy({left:-200,behavior:'smooth'})"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>`;
+
+        const hintRight = document.createElement('div');
+        hintRight.className = 'scroll-hint scroll-hint-right';
+        hintRight.innerHTML = `<div class="scroll-hint-arrow" onclick="document.getElementById('${scrollId}').scrollBy({left:200,behavior:'smooth'})"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>`;
 
         rowWrap.appendChild(grid);
-        rowWrap.appendChild(fade);
+        rowWrap.appendChild(hintLeft);
+        rowWrap.appendChild(hintRight);
         section.appendChild(rowWrap);
         container.appendChild(section);
 
-        // Show/hide fade on scroll
-        grid.addEventListener('scroll', () => {
-            fade.classList.toggle('visible', grid.scrollLeft > 30);
-        });
+        // RTL scroll: scrollLeft is 0 at right edge, goes negative when scrolling left
+        const updateHints = () => {
+            const maxScroll = grid.scrollWidth - grid.clientWidth;
+            const sl = grid.scrollLeft; // In RTL: 0 = right edge, negative = scrolled left
+            // Show left arrow when NOT fully scrolled left (more content to the left)
+            hintLeft.classList.toggle('hidden', Math.abs(sl) >= maxScroll - 5);
+            // Show right arrow when scrolled away from right edge
+            hintRight.classList.toggle('visible', Math.abs(sl) > 30);
+            hintRight.classList.toggle('hidden', Math.abs(sl) <= 30);
+        };
+        grid.addEventListener('scroll', updateHints);
+        // Initial check after render
+        setTimeout(updateHints, 100);
     });
 }
 
