@@ -812,16 +812,19 @@ function buildStoryMockup(p) {
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-left:3px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </div>
-                <!-- Bottom: CTA bar -->
-                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,0.7) 30%, #000 60%);padding:12px 10px 6px;text-align:center;">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" style="margin-bottom:4px;"><polyline points="18 15 12 9 6 15"/></svg>
-                    <div style="background:white;border-radius:20px;padding:6px 0;text-align:center;font-size:8px;font-weight:800;color:#333;letter-spacing:0.5px;display:flex;align-items:center;justify-content:center;gap:4px;">
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <!-- Bottom: solid black CTA bar -->
+                <div style="position:absolute;bottom:0;left:0;right:0;background:#000;padding:5px 10px 4px;text-align:center;">
+                    <!-- Chevron up -->
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" style="margin-bottom:3px;"><polyline points="18 15 12 9 6 15"/></svg>
+                    <!-- White CTA pill -->
+                    <div style="background:white;border-radius:22px;padding:7px 0;text-align:center;font-size:9px;font-weight:800;color:#1a1a1a;letter-spacing:0.5px;display:flex;align-items:center;justify-content:center;gap:5px;">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                         LEARN MORE
                     </div>
                 </div>
-                <!-- Social proof below CTA -->
-                <div style="position:absolute;bottom:2px;left:6px;right:6px;text-align:center;">
+                <!-- Social proof below black bar -->
+                <div style="position:absolute;bottom:1px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:3px;">
+                    <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.2);flex-shrink:0;"></div>
                     <span style="color:rgba(255,255,255,0.35);font-size:4.5px;">Micha Feller follows milega.</span>
                 </div>
                 ` : `
@@ -838,23 +841,20 @@ function buildStoryMockup(p) {
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-left:3px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </div>
-                <!-- Bottom: gradient fade + CTA + action icons -->
-                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.85));">
-                    <!-- CTA pill -->
-                    <div style="padding:12px 14px 5px;text-align:center;">
-                        <div style="background:white;border-radius:20px;padding:6px 0;text-align:center;font-size:7px;font-weight:600;color:#333;display:flex;align-items:center;justify-content:center;gap:3px;">
-                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                            Learn more
-                        </div>
+                <!-- CTA floating over content with gradient -->
+                <div style="position:absolute;bottom:22px;left:0;right:0;padding:0 14px;">
+                    <div style="background:white;border-radius:22px;padding:7px 0;text-align:center;font-size:8px;font-weight:600;color:#333;display:flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        Learn more
                     </div>
-                    <!-- Ad label + action icons row -->
-                    <div style="padding:3px 8px 8px;display:flex;justify-content:space-between;align-items:center;">
-                        <span style="color:rgba(255,255,255,0.4);font-size:5px;">Ad</span>
-                        <div style="display:flex;gap:8px;">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                        </div>
+                </div>
+                <!-- Bottom black bar: Ad + action icons -->
+                <div style="position:absolute;bottom:0;left:0;right:0;background:#000;padding:3px 8px 8px;display:flex;justify-content:space-between;align-items:center;">
+                    <span style="color:rgba(255,255,255,0.4);font-size:5px;">Ad</span>
+                    <div style="display:flex;gap:8px;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                     </div>
                 </div>
                 `}
