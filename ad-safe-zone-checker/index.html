@@ -193,12 +193,27 @@
         .tab-btn { transition: all 0.15s; }
         .filter-btn { transition: all 0.15s; }
 
+        .placement-row-wrap { position: relative; }
         .placement-row-scroll {
             display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x proximity;
             -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px;
         }
         .placement-row-scroll::-webkit-scrollbar { display: none; }
         .placement-row-scroll .pair-card { flex: 0 0 auto; scroll-snap-align: start; }
+        /* Scroll fade hint on left edge */
+        .scroll-fade {
+            position: absolute; top: 0; left: 0; bottom: 2px; width: 48px; z-index: 5;
+            background: linear-gradient(to right, rgba(10,22,40,0.85) 0%, transparent 100%);
+            pointer-events: none; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .scroll-fade.visible { opacity: 1; }
+        .scroll-fade-arrow {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center;
+            pointer-events: auto; cursor: pointer;
+        }
+        .scroll-fade-arrow svg { opacity: 0.6; }
 
         /* Section titles */
         .section-title { color: rgba(255,255,255,0.9); font-weight: 600; }
@@ -699,8 +714,13 @@ function renderPlacements() {
         section.className = 'mb-4';
         section.innerHTML = `<div class="text-base font-bold text-white/90 mb-2">${row.label}</div>`;
 
+        const rowWrap = document.createElement('div');
+        rowWrap.className = 'placement-row-wrap';
+
         const grid = document.createElement('div');
         grid.className = 'placement-row-scroll';
+        const scrollId = 'scroll-' + row.key;
+        grid.id = scrollId;
 
         visiblePlacements.forEach(p => {
             const card = document.createElement('div');
@@ -720,8 +740,21 @@ function renderPlacements() {
             grid.appendChild(card);
         });
 
-        section.appendChild(grid);
+        // Scroll fade indicator
+        const fade = document.createElement('div');
+        fade.className = 'scroll-fade';
+        fade.id = 'fade-' + row.key;
+        fade.innerHTML = `<div class="scroll-fade-arrow" onclick="document.getElementById('${scrollId}').scrollBy({left:-200,behavior:'smooth'})"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>`;
+
+        rowWrap.appendChild(grid);
+        rowWrap.appendChild(fade);
+        section.appendChild(rowWrap);
         container.appendChild(section);
+
+        // Show/hide fade on scroll
+        grid.addEventListener('scroll', () => {
+            fade.classList.toggle('visible', grid.scrollLeft > 30);
+        });
     });
 }
 
@@ -1073,9 +1106,13 @@ function buildStoryCarouselMockup(p) {
                     <div style="background:white;border-radius:20px;padding:5px 0;text-align:center;font-size:9px;font-weight:600;color:#333;">Shop now</div>
                 </div>
             </div>
+            <div id="sc-sz-${p.id}" style="position:absolute;inset:0;z-index:12;"></div>
             <div class="phone-home-indicator"></div>
         </div>
     `;
+    const szContainer = phone.querySelector(`#sc-sz-${p.id}`);
+    const sz = createSafeZoneOverlay('story');
+    if (sz) { sz.style.position = 'absolute'; sz.style.inset = '0'; szContainer.appendChild(sz); }
     return phone;
 }
 
@@ -1132,10 +1169,14 @@ function buildReelsCarouselMockup(p) {
                     <div style="color:white;font-size:7px;opacity:0.7;">Sponsored</div>
                 </div>
             </div>
+            <div id="rc-sz-${p.id}" style="position:absolute;inset:0;z-index:12;"></div>
             <div class="phone-bottom-nav" dir="ltr">${bottomNavSVG}</div>
             <div class="phone-home-indicator"></div>
         </div>
     `;
+    const szContainer = phone.querySelector(`#rc-sz-${p.id}`);
+    const sz = createSafeZoneOverlay('reels');
+    if (sz) { sz.style.position = 'absolute'; sz.style.inset = '0'; szContainer.appendChild(sz); }
     return phone;
 }
 
