@@ -468,8 +468,8 @@ const placements = [
 // Square (1:1) placements don't need safe zones - the UI chrome is outside the image area
 // Pixel values based on 1080x1920 canvas
 const safeZoneSpecs = {
-    story:   { top: 14, bottom: 20, left: 0, right: 0, px: { top: 250, bottom: 340, left: 0, right: 0 },  labels: { top: 'UI / PROFILE', bottom: 'CTA' } },
-    reels:   { top: 11.5, bottom: 23.4, left: 3.2, right: 3.2, px: { top: 220, bottom: 450, left: 35, right: 35 }, labels: { top: 'UI OVERLAY', bottom: 'CTA / CAPTION', right: '' } },
+    story:   { top: 14, bottom: 22, left: 0, right: 0, px: { top: 270, bottom: 420, left: 0, right: 0 },  labels: { top: 'UI / PROFILE', bottom: 'CTA' } },
+    reels:   { top: 11.5, bottom: 30, left: 0, right: 0, px: { top: 220, bottom: 575, left: 0, right: 0 }, labels: { top: 'UI OVERLAY', bottom: 'CTA / CAPTION' } },
 };
 
 const gdnSizes = [
@@ -874,20 +874,14 @@ function buildStoryMockup(p) {
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-left:3px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </div>
-                <!-- Info bar above CTA -->
-                <div style="position:absolute;bottom:34px;left:0;right:0;padding:0 6px;">
-                    <div style="color:white;font-size:5.5px;text-align:center;opacity:0.85;" dir="rtl">בד קורדרי איכותי | 5 גוונים לבחירה | משלוח חינם</div>
+                <!-- Info bar on creative -->
+                <div style="position:absolute;bottom:30px;left:0;right:0;padding:0 6px;">
+                    <div style="color:white;font-size:5.5px;text-align:center;opacity:0.9;text-shadow:0 1px 3px rgba(0,0,0,0.5);" dir="rtl">בד קורדרי איכותי | 5 גוונים לבחירה | משלוח חינם</div>
                 </div>
-                <!-- CTA pill floating over creative -->
-                <div style="position:absolute;bottom:16px;left:12px;right:12px;">
-                    <div style="background:white;border-radius:22px;padding:7px 0;text-align:center;font-size:9px;font-weight:800;color:#1a1a1a;letter-spacing:0.5px;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                        Order now
-                    </div>
-                </div>
-                <!-- Bottom bar -->
-                <div style="position:absolute;bottom:0;left:0;right:0;background:#000;padding:3px 8px;display:flex;align-items:center;justify-content:center;">
-                    <span style="color:rgba(255,255,255,0.4);font-size:5px;">Ad</span>
+                <!-- CTA colored strip (matching Meta FB Stories) -->
+                <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(190,120,90,0.92);padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:5px;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    <span style="color:white;font-size:9px;font-weight:600;letter-spacing:0.3px;">Order now</span>
                 </div>
                 ` : `
                 <!-- IG Stories -->
@@ -980,12 +974,22 @@ function buildReelsMockup(p) {
                         <span style="color:white;font-size:7px;font-weight:600;">Milega מילגה</span>
                     </div>
                     <div style="color:white;font-size:5.5px;opacity:0.85;margin-bottom:2px;" dir="rtl">קורדרי איכותי | 5 גוונים לבחירה</div>
-                    <div style="color:white;font-size:6px;opacity:0.85;margin-bottom:4px;" dir="rtl">חדש במילגה! סדרת הספות <span style="opacity:0.5;">more...</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                        <div style="color:white;font-size:6px;opacity:0.85;" dir="rtl">חדש במילגה! סדרת הספות</div>
+                        <span style="color:rgba(255,255,255,0.5);font-size:6px;">more...</span>
+                    </div>
                     <div style="background:white;border-radius:6px;padding:5px 0;text-align:center;font-size:8px;font-weight:600;color:#333;margin-bottom:4px;">Order now</div>
-                    <span style="color:rgba(255,255,255,0.4);font-size:5px;">Ad</span>
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <span style="color:rgba(255,255,255,0.4);font-size:5px;">Ad</span>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255,255,255,0.4)"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                    </div>
                 </div>
                 ` : `
-                <!-- IG Reels - no header, content edge to edge -->
+                <!-- IG Reels header -->
+                <div style="position:absolute;top:20px;left:8px;right:8px;display:flex;align-items:center;justify-content:space-between;">
+                    <span style="color:white;font-size:12px;font-weight:700;">Reels</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
                 <!-- Right side actions -->
                 <div style="position:absolute;right:6px;bottom:68px;display:flex;flex-direction:column;gap:8px;align-items:center;">
                     <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
