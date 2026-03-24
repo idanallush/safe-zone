@@ -469,7 +469,7 @@ const placements = [
 // Pixel values based on 1080x1920 canvas
 const safeZoneSpecs = {
     story: { top: 14, bottom: 20, left: 0, right: 0, px: { top: 270, bottom: 380, left: 0, right: 0 }, labels: { top: 'PROFILE / UI', bottom: 'CTA / AD BAR' } },
-    reels: { top: 14, bottom: 35, left: 0, right: 6, px: { top: 270, bottom: 670, left: 0, right: 65 }, labels: { top: 'UI OVERLAY', bottom: 'CTA / CAPTION / AD', right: 'ACTIONS' } },
+    reels: { top: 14, bottom: 35, left: 6, right: 6, px: { top: 270, bottom: 672, left: 65, right: 65 }, labels: { top: 'UI OVERLAY', bottom: 'CTA / CAPTION', right: '' } },
 };
 
 const gdnSizes = [
@@ -660,7 +660,7 @@ function createSafeZoneOverlay(mockupType) {
     // Semi-transparent dark overlays on danger zones
     addZone(overlay, `top:0;left:0;right:0;height:${spec.top}%;`);
     addZone(overlay, `bottom:0;left:0;right:0;height:${spec.bottom}%;`);
-    if (spec.left > 0) addZone(overlay, `top:${spec.top}%;right:0;width:${spec.left}%;bottom:${spec.bottom}%;`);
+    if (spec.left > 0) addZone(overlay, `top:${spec.top}%;left:0;width:${spec.left}%;bottom:${spec.bottom}%;`);
     if (spec.right > 0) addZone(overlay, `top:${spec.top}%;right:0;width:${spec.right}%;bottom:${spec.bottom}%;`);
 
     // Dashed border lines at safe zone edges
@@ -672,8 +672,8 @@ function createSafeZoneOverlay(mockupType) {
     addLabel(overlay, `${spec.px.bottom}px`, `bottom:${spec.bottom}%;left:50%;transform:translate(-50%,120%);`);
 
     if (spec.left > 0) {
-        addLine(overlay, 'vertical', `right:${100 - spec.left}%`);
-        addLabel(overlay, `${spec.px.left}px`, `right:${100 - spec.left}%;top:50%;transform:translate(120%,-50%);font-size:7px;`);
+        addLine(overlay, 'vertical', `left:${spec.left}%`);
+        addLabel(overlay, `${spec.px.left}px`, `left:${spec.left}%;top:50%;transform:translate(-120%,-50%);font-size:7px;`);
     }
     if (spec.right > 0) {
         addLine(overlay, 'vertical', `left:${100 - spec.right}%`);
