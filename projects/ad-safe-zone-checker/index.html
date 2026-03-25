@@ -89,17 +89,24 @@
 
         .safe-zone-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; display: none; }
         .safe-zone-overlay.active { display: block; }
-        .sz-danger { position: absolute; background: rgba(255, 200, 0, 0.30); }
+        .sz-danger { position: absolute; background: rgba(255, 200, 0, 0.25); }
         .sz-line { position: absolute; }
-        .sz-line.horizontal { height: 0; left: 0; right: 0; border-top: 2px dashed rgba(255, 220, 0, 0.95); }
-        .sz-line.vertical { width: 0; top: 0; bottom: 0; border-left: 2px dashed rgba(255, 220, 0, 0.95); }
-        .sz-label {
-            position: absolute; color: #FFD700; font-size: 10px; font-weight: 800;
-            white-space: nowrap; direction: ltr; text-align: center;
+        .sz-line.horizontal { height: 0; left: 0; right: 0; border-top: 1.5px dashed rgba(255, 220, 0, 0.7); }
+        .sz-line.vertical { width: 0; top: 0; bottom: 0; border-left: 1.5px dashed rgba(255, 220, 0, 0.7); }
+
+        /* External safe zone labels (outside the mockup screen) */
+        .mockup-with-labels { display: flex; flex-direction: column; align-items: center; gap: 0; }
+        .sz-main-row { display: flex; align-items: center; gap: 0; }
+        .sz-external-label { display: flex; align-items: center; justify-content: center; }
+        .sz-label-top, .sz-label-bottom { flex-direction: column; }
+        .sz-label-text {
+            color: #FFD700; font-size: 9px; font-weight: 700; white-space: nowrap; direction: ltr;
             font-family: -apple-system, sans-serif;
-            background: rgba(0,0,0,0.80); padding: 2px 7px; border-radius: 4px; line-height: 1;
-            border: 1px solid rgba(255, 220, 0, 0.3);
+            background: rgba(0,0,0,0.75); padding: 2px 6px; border-radius: 4px; line-height: 1;
+            border: 1px solid rgba(255, 220, 0, 0.25);
         }
+        .sz-connector-v { width: 1px; height: 6px; background: rgba(255, 220, 0, 0.5); }
+        .sz-connector-h { width: 6px; height: 1px; background: rgba(255, 220, 0, 0.5); }
 
         .toggle-track {
             width: 40px; height: 22px; border-radius: 11px;
@@ -656,28 +663,17 @@ function createSafeZoneOverlay(mockupType) {
     const overlay = document.createElement('div');
     overlay.className = 'safe-zone-overlay' + (state.safeZones ? ' active' : '');
 
-    // Semi-transparent dark overlays on danger zones
+    // Semi-transparent yellow overlays on danger zones
     addZone(overlay, `top:0;left:0;right:0;height:${spec.top}%;`);
     addZone(overlay, `bottom:0;left:0;right:0;height:${spec.bottom}%;`);
     if (spec.left > 0) addZone(overlay, `top:${spec.top}%;left:0;width:${spec.left}%;bottom:${spec.bottom}%;`);
     if (spec.right > 0) addZone(overlay, `top:${spec.top}%;right:0;width:${spec.right}%;bottom:${spec.bottom}%;`);
 
-    // Dashed border lines at safe zone edges
+    // Dashed border lines only — labels are external now
     addLine(overlay, 'horizontal', `top:${spec.top}%`);
     addLine(overlay, 'horizontal', `bottom:${spec.bottom}%`);
-
-    // Labels: "14% · 358px" format
-    addLabel(overlay, `${spec.top}% · ${spec.px.top}px`, `top:${spec.top}%;left:50%;transform:translate(-50%,-120%);`);
-    addLabel(overlay, `${spec.bottom}% · ${spec.px.bottom}px`, `bottom:${spec.bottom}%;left:50%;transform:translate(-50%,120%);`);
-
-    if (spec.left > 0) {
-        addLine(overlay, 'vertical', `left:${spec.left}%`);
-        addLabel(overlay, `${spec.left}% · ${spec.px.left}px`, `left:${spec.left}%;top:50%;transform:translate(-120%,-50%);font-size:7px;`);
-    }
-    if (spec.right > 0) {
-        addLine(overlay, 'vertical', `left:${100 - spec.right}%`);
-        addLabel(overlay, `${spec.right}% · ${spec.px.right}px`, `left:${100 - spec.right}%;top:50%;transform:translate(-120%,-50%);font-size:7px;`);
-    }
+    if (spec.left > 0) addLine(overlay, 'vertical', `left:${spec.left}%`);
+    if (spec.right > 0) addLine(overlay, 'vertical', `left:${100 - spec.right}%`);
 
     return overlay;
 }
@@ -695,18 +691,53 @@ function addLine(parent, dir, style) {
     el.style.cssText = style;
     parent.appendChild(el);
 }
-function addLabel(parent, text, style) {
-    const el = document.createElement('div');
-    el.className = 'sz-label';
-    el.textContent = text;
-    el.style.cssText = style;
-    parent.appendChild(el);
+
+// Wrap a mockup screen element with external safe zone labels
+function wrapWithExternalLabels(screenEl, mockupType) {
+    const spec = safeZoneSpecs[mockupType];
+    if (!spec) return screenEl;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mockup-with-labels';
+
+    if (spec.top > 0) wrapper.appendChild(createExternalLabel('top', `${spec.top}% · ${spec.px.top}px`));
+
+    const mainRow = document.createElement('div');
+    mainRow.className = 'sz-main-row';
+    if (spec.left > 0) mainRow.appendChild(createExternalLabel('left', `${spec.left}%·${spec.px.left}px`));
+    mainRow.appendChild(screenEl);
+    if (spec.right > 0) mainRow.appendChild(createExternalLabel('right', `${spec.right}%·${spec.px.right}px`));
+    wrapper.appendChild(mainRow);
+
+    if (spec.bottom > 0) wrapper.appendChild(createExternalLabel('bottom', `${spec.bottom}% · ${spec.px.bottom}px`));
+
+    return wrapper;
+}
+
+function createExternalLabel(position, text) {
+    const label = document.createElement('div');
+    label.className = 'sz-external-label sz-label-' + (position === 'left' || position === 'right' ? 'side' : position);
+    if (!state.safeZones) label.style.display = 'none';
+
+    if (position === 'top') {
+        label.innerHTML = `<span class="sz-label-text">${text}</span><div class="sz-connector-v"></div>`;
+    } else if (position === 'bottom') {
+        label.innerHTML = `<div class="sz-connector-v"></div><span class="sz-label-text">${text}</span>`;
+    } else if (position === 'left') {
+        label.innerHTML = `<span class="sz-label-text">${text}</span><div class="sz-connector-h"></div>`;
+    } else {
+        label.innerHTML = `<div class="sz-connector-h"></div><span class="sz-label-text">${text}</span>`;
+    }
+    return label;
 }
 
 function toggleSafeZones() {
     state.safeZones = !state.safeZones;
     document.getElementById('sz-toggle').classList.toggle('on', state.safeZones);
     document.querySelectorAll('#facebook-section .safe-zone-overlay').forEach(el => el.classList.toggle('active', state.safeZones));
+    document.querySelectorAll('#facebook-section .sz-external-label').forEach(el => {
+        el.style.display = state.safeZones ? '' : 'none';
+    });
 }
 
 // ============================================================
@@ -883,7 +914,7 @@ function buildStoryMockup(p) {
     const szContainer = el.querySelector(`#story-sz-${p.id}`);
     const sz = createSafeZoneOverlay('story');
     if (sz) { sz.style.position = 'absolute'; sz.style.inset = '0'; szContainer.appendChild(sz); }
-    return el;
+    return wrapWithExternalLabels(el, 'story');
 }
 
 // ============================================================
@@ -923,7 +954,7 @@ function buildReelsMockup(p) {
     const szContainer = el.querySelector(`#reels-sz-${p.id}`);
     const sz = createSafeZoneOverlay('reels');
     if (sz) { sz.style.position = 'absolute'; sz.style.inset = '0'; szContainer.appendChild(sz); }
-    return el;
+    return wrapWithExternalLabels(el, 'reels');
 }
 
 // ============================================================
@@ -1017,7 +1048,7 @@ function buildStoryCarouselMockup(p) {
     const szContainer = el.querySelector(`#sc-sz-${p.id}`);
     const sz = createSafeZoneOverlay('story');
     if (sz) { sz.style.position = 'absolute'; sz.style.inset = '0'; szContainer.appendChild(sz); }
-    return el;
+    return wrapWithExternalLabels(el, 'story');
 }
 
 // ============================================================
@@ -1064,7 +1095,7 @@ function buildReelsCarouselMockup(p) {
     const szContainer = el.querySelector(`#rc-sz-${p.id}`);
     const sz = createSafeZoneOverlay('reels');
     if (sz) { sz.style.position = 'absolute'; sz.style.inset = '0'; szContainer.appendChild(sz); }
-    return el;
+    return wrapWithExternalLabels(el, 'reels');
 }
 
 // ============================================================
