@@ -11,11 +11,33 @@
 ## פיצ'רים
 
 ### Facebook & Instagram
-- **תמונה בודדת 9:16** — סטורי ורילס עם מוקאפ מלא של ממשק FB/IG
+- **תמונה בודדת 9:16** — סטורי ורילס עם מוקאפ מינימלי של ממשק FB/IG
+- **תמונה/וידאו 4:5** — פוסט פיד עם מוקאפ IG/FB feed
 - **קרוסלה 9:16** — עד 10 תמונות, ניווט בין שקופיות
 - **קרוסלה 1:1** — קרוסלת פיד עם מוקאפ Facebook/Instagram feed
-- **Safe Zones** — שכבות ויזואליות עם מידות בפיקסלים (Meta 2026 guidelines)
-- **Toggle Safe Zones** — הפעלה/כיבוי מיידי
+- **Safe Zones** — שכבות ויזואליות צהובות עם מידות באחוזים ובפיקסלים
+- **תוויות חיצוניות** — מידות Safe Zone מוצגות מחוץ למוקאפ עם קווי חיבור, לא על התמונה
+- **Toggle Safe Zones** — הפעלה/כיבוי מיידי (כולל תוויות חיצוניות)
+
+### Safe Zone Specs (Meta 2026, בסיס: 1440x2560)
+
+| פורמט | למעלה | למטה | צדדים |
+|-------|-------|------|-------|
+| Stories (IG + FB) | 14% (358px) | 14% (358px) | ללא |
+| Reels (IG + FB) | 14% (358px) | 35% (896px) | 6% (86px) |
+| Feed (4:5, 1:1) | ללא | ללא | ללא |
+
+### מיקומי פרסום (12 מוקאפים)
+
+**שורה 1 — סטוריז ורילס (9:16):**
+- IG Story, FB Story, IG Reels, FB Reels
+- IG Story Carousel, FB Story Carousel, IG Reels Carousel, FB Reels Carousel
+
+**שורה 2 — פיד (4:5):**
+- IG Feed Post, FB Feed Post
+
+**שורה 3 — קרוסלה פיד (1:1):**
+- IG Feed Carousel, FB Feed Carousel
 
 ### Google Display Network
 - **17 גדלי באנר** — Medium Rectangle, Leaderboard, Skyscraper, Mobile ועוד
@@ -23,12 +45,15 @@
 - **מוקאפ אתרים ישראליים** — ynet, mako, walla!, N12, Sport5
 - **פילטרים** — Rectangle, Leaderboard, Skyscraper, Mobile
 
-### מוקאפים (Pixel-Perfect)
-- **FB Story** — progress bar מחולק, פרופיל + Sponsored, CTA צף "LEARN MORE" עם אייקון לינק כחול, social proof
-- **IG Story** — progress bar, פרופיל, CTA "Learn more" צף, בר "Ad" + אייקוני heart/comment/send
-- **FB Reels** — hamburger + "Reels" header, אייקוני like/comment/share/bookmark, "Sign up" CTA, "Sponsored" + "Explore more", bottom nav 6 טאבים
-- **IG Reels** — ללא header (edge-to-edge), gradient story ring, "Follow", caption, "Ad", music thumbnail, bottom nav 5 אייקונים
-- **Feed Carousel** — FB ו-IG, כולל reactions, like/comment/share
+### מוקאפים (Meta-style — ללא מסגרת טלפון)
+- **מסך פשוט** — מלבן מעוגל 9:16 עם רקע שחור, ללא bezel/status bar/nav bar
+- **IG Story** — progress bar + פרופיל Bright + Sponsored + CTA pill + Ad
+- **FB Story** — 3 סגמנטים progress + פרופיל Bright Agency + Sponsored + CTA pill + Ad
+- **IG Reels** — אייקוני heart/comment/send (ללא ספירות) + פרופיל + caption + CTA + Ad
+- **FB Reels** — "Reels" header + אייקוני like/comment/share + פרופיל + CTA + Sponsored
+- **IG Feed (4:5)** — header + תמונה 4:5 + אייקוני פעולה + caption
+- **FB Feed (4:5)** — header + תמונה 4:5 + Like/Comment/Share
+- **Feed Carousel** — header + track + ניווט + dots
 
 ### ייצוא
 - **PDF** — ייצוא נקי עם רקע מוצק (מחליף glass effects בזמן הצילום)
@@ -36,9 +61,11 @@
 
 ### עיצוב
 - **Dark Glassmorphism** — כרטיסים שקופים עם backdrop-blur מעל תמונת רקע מטושטשת
+- **צבע Safe Zone צהוב** — אוברליי, קווים מקווקווים, ותוויות בגוון זהב/צהוב
 - **RTL מלא** — עברית, כולל scroll hints מותאמי RTL
 - **רספונסיב** — מותאם למובייל (375px) ועד דסקטופ
 - **Scroll hints** — חיצים עם pulse animation שמנחים לגלילה
+- **מיתוג Bright** — לוגו ושם Bright Agency בכל המוקאפים
 
 ## טכנולוגיות
 
@@ -71,11 +98,13 @@ npx serve ad-safe-zone-checker -l 8091
 
 ```
 ad-safe-zone-checker/
-├── index.html    # כל האפליקציה (1714 שורות)
+├── index.html                                              # כל האפליקציה (~1620 שורות)
+├── 220829521_102123092143924_6403435025276078538_n.jpg      # לוגו Bright Agency
+├── README.md
 ├── .gitignore
-└── .vercel/      # הגדרות Vercel
+└── .vercel/                                                 # הגדרות Vercel
 ```
 
 ## רישיון
 
-פרויקט פנימי.
+פרויקט פנימי — Bright Agency.
