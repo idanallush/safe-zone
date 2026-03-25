@@ -202,6 +202,11 @@ These skills are available in my Claude Code setup:
 - Emoji in professional/marketing content
 - Blurry or low-quality images
 
+## Thinking & Execution Mode
+- **Ultrathink** — always use extended thinking / deep reasoning before acting
+- **Use sub-agents** when the task is complex — break it into parallel or sequential agents for planning, building, debugging, and reviewing
+- **ALWAYS research before implementing** — before making any change, search for the latest best practices and newest documentation. Only implement if you are 100% sure it will work. Do not guess or use outdated patterns.
+
 ## Important Rules
 - **Never skip RTL** — if content is in Hebrew, it must be RTL
 - **Always mobile-first** — design for mobile, then scale up
@@ -210,5 +215,11 @@ These skills are available in my Claude Code setup:
 - **Show progress** — use todo lists for multi-step tasks
 - **Test visually** — always check the result looks right, not just that code compiles
 - **Read DESIGN_SYSTEM.md** — for any UI project, load the full design system file first
+
+## Workflow for Claude Code Prompts
+When sending me a prompt to paste into Claude Code, always structure it like this:
+1. **Start:** "Read CLAUDE.md and DESIGN_SYSTEM.md first"
+2. **Task:** The actual implementation instructions
+3. **End:** "Verify everything works (no errors, no warnings), then build and deploy"
 
 *Last updated: March 2026*
