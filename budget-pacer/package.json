@@ -1,0 +1,24 @@
+{
+  "name": "budget-pacer",
+  "version": "1.0.0",
+  "description": "Budget Pacing & Overspend Forecasting Tool",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "nodemon src/server/index.js",
+    "dev:client": "cd src/client && npx vite --port 5174",
+    "build:client": "cd src/client && npx vite build",
+    "start": "node src/server/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "express": "^4.18.2",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "nodemon": "^3.1.0"
+  }
+}

@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milega — Static Ad Gallery</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --glass-bg: rgba(20, 25, 30, 0.65);
+    --glass-bg-hover: rgba(25, 30, 38, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-hover: rgba(255, 255, 255, 0.15);
+    --glass-blur: 24px;
+    --glass-radius: 20px;
+    --accent: #26bdd4;
+    --accent-glow: rgba(38, 189, 212, 0.3);
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.55);
+    --text-muted: rgba(255, 255, 255, 0.35);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #0a0c10;
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background with gradient mesh */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(38, 189, 212, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(212, 173, 132, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(151, 188, 197, 0.04) 0%, transparent 60%),
+      linear-gradient(160deg, #0a0c10 0%, #0f1218 50%, #0a0c10 100%);
+    filter: blur(0px);
+  }
+
+  /* Noise overlay for texture */
+  .bg-layer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 128px;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ─── Top Header Bar ─── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), #d4ad84);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+
+  .header-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .header-title span {
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-left: 8px;
+  }
+
+  .header-stats {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .stat-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .stat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--glass-border-hover);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background: #2ad0e8;
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ─── Main Layout ─── */
+  .main-layout {
+    display: flex;
+    flex: 1;
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+    padding: 24px 16px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-right: 1px solid var(--glass-border);
+    height: calc(100vh - 69px);
+    position: sticky;
+    top: 69px;
+    overflow-y: auto;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .sidebar-section {
+    margin-bottom: 28px;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    padding: 0 12px;
+  }
+
+  .template-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .template-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+
+  .template-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--glass-border);
+  }
+
+  .template-item.active {
+    background: rgba(38, 189, 212, 0.1);
+    border-color: rgba(38, 189, 212, 0.2);
+  }
+
+  .template-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .template-item.active .template-num {
+    background: rgba(38, 189, 212, 0.15);
+    color: var(--accent);
+  }
+
+  .template-info h4 {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 2px;
+    color: var(--text-primary);
+  }
+
+  .template-info p {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .template-count {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+
+  /* ─── Content Area ─── */
+  .content {
+    flex: 1;
+    padding: 28px 32px;
+    overflow-y: auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .section-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-badge {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    background: rgba(38, 189, 212, 0.1);
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
+
+  .view-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+    padding: 3px;
+    border: 1px solid var(--glass-border);
+  }
+
+  .view-btn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .view-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+  }
+
+  .view-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ─── Template Section ─── */
+  .template-section {
+    margin-bottom: 48px;
+  }
+
+  /* ─── Card Grid ─── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .card-grid.large {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  /* ─── Glass Card ─── */
+  .card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-radius);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .card:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .card-image {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+  }
+
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card:hover .card-image img {
+    transform: scale(1.05);
+  }
+
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.6) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .card:hover .card-overlay {
+    opacity: 1;
+  }
+
+  .card-overlay-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .card-overlay-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .card-overlay-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .card-overlay-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .card-info {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-info h3 {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: -0.1px;
+  }
+
+  .card-info .card-variant {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  /* ─── Lightbox Modal ─── */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  .lightbox.active {
+    display: flex;
+  }
+
+  .lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: var(--glass-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--glass-border);
+  }
+
+  .lightbox-content img {
+    max-width: 90vw;
+    max-height: 85vh;
+    object-fit: contain;
+    display: block;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(20, 25, 30, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(20, 25, 30, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .lightbox-nav:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .lightbox-nav.prev { left: 16px; }
+  .lightbox-nav.next { right: 16px; }
+
+  .lightbox-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px;
+    background: rgba(20, 25, 30, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .lightbox-info h3 {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .lightbox-info span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* ─── Scrollbar ─── */
+  .content::-webkit-scrollbar { width: 6px; }
+  .content::-webkit-scrollbar-track { background: transparent; }
+  .content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+  .content::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .header { padding: 12px 16px; }
+    .content { padding: 20px 16px; }
+    .header-stats { display: none; }
+    .card-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  }
+
+  /* ─── Animations ─── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .template-section {
+    animation: fadeInUp 0.5s ease both;
+  }
+
+  .template-section:nth-child(2) { animation-delay: 0.1s; }
+  .template-section:nth-child(3) { animation-delay: 0.2s; }
+  .template-section:nth-child(4) { animation-delay: 0.3s; }
+  .template-section:nth-child(5) { animation-delay: 0.4s; }
+
+  .card {
+    animation: fadeInUp 0.4s ease both;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<div class="app">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="brand-logo">M</div>
+      <div class="header-title">Milega <span>Ad Gallery</span></div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <div class="stat-dot"></div>
+        <span class="stat-value">42</span> creatives
+      </div>
+      <div class="stat-item">
+        <div class="stat-dot" style="background: #d4ad84;"></div>
+        <span class="stat-value">5</span> templates
+      </div>
+      <div class="stat-item">
+        <span style="color: var(--text-muted);">March 16, 2026</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn" onclick="toggleGrid()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Grid
+      </button>
+      <button class="btn" id="filterAllBtn" onclick="showAll()">All</button>
+      <a class="btn btn-primary" href="#" onclick="downloadAll(event)">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Export
+      </a>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Templates</div>
+        <div class="template-list">
+          <div class="template-item active" onclick="filterTemplate('all')">
+            <div class="template-num">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </div>
+            <div class="template-info">
+              <h4>All Creatives</h4>
+              <p>View all templates</p>
+            </div>
+            <span class="template-count">42</span>
+          </div>
+          <div class="template-item" onclick="filterTemplate('01')">
+            <div class="template-num">01</div>
+            <div class="template-info">
+              <h4>Headline</h4>
+              <p>Bold hero statements</p>
+            </div>
+            <span class="template-count">8</span>
+          </div>
+          <div class="template-item" onclick="filterTemplate('07')">
+            <div class="template-num">07</div>
+            <div class="template-info">
+              <h4>Us Vs Them</h4>
+              <p>Competitive comparison</p>
+            </div>
+            <span class="template-count">8</span>
+          </div>
+          <div class="template-item" onclick="filterTemplate('09')">
+            <div class="template-num">09</div>
+            <div class="template-info">
+              <h4>Negative Marketing</h4>
+              <p>Disruptive angles</p>
+            </div>
+            <span class="template-count">9</span>
+          </div>
+          <div class="template-item" onclick="filterTemplate('13')">
+            <div class="template-num">13</div>
+            <div class="template-info">
+              <h4>Stat Surround Hero</h4>
+              <p>Data-driven visuals</p>
+            </div>
+            <span class="template-count">9</span>
+          </div>
+          <div class="template-item" onclick="filterTemplate('15')">
+            <div class="template-num">15</div>
+            <div class="template-info">
+              <h4>Social Comment</h4>
+              <p>Screenshot style</p>
+            </div>
+            <span class="template-count">8</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Quick Info</div>
+        <div style="padding: 14px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);">
+          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Brand Colors</div>
+          <div style="display: flex; gap: 6px; margin-bottom: 14px;">
+            <div style="width: 24px; height: 24px; border-radius: 6px; background: #0e0e0e; border: 1px solid rgba(255,255,255,0.15);" title="#0e0e0e"></div>
+            <div style="width: 24px; height: 24px; border-radius: 6px; background: #d4ad84;" title="#d4ad84"></div>
+            <div style="width: 24px; height: 24px; border-radius: 6px; background: #97bcc5;" title="#97bcc5"></div>
+            <div style="width: 24px; height: 24px; border-radius: 6px; background: #26bdd4;" title="#26bdd4"></div>
+          </div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Resolution</div>
+          <div style="font-size: 13px; font-weight: 500;">2K (2048px)</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+
+      <!-- Template: Headline -->
+      <div class="template-section" data-template="01">
+        <div class="section-header">
+          <h2>#01 — Headline <span class="section-badge">8 creatives</span></h2>
+        </div>
+        <div class="card-grid" id="grid">
+          <div class="card" onclick="openLightbox(this)">
+            <div class="card-image">
+              <img src="01-headline/headline_v1_img1.png" alt="Headline v1" loading="lazy">
+              <div class="card-overlay">
+                <div class="card-overlay-actions">
+                  <button class="card-overlay-btn" title="Expand" onclick="event.stopPropagation(); openLightbox(this.closest('.card'))">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="card-info">
+              <h3>Headline</h3>
+              <span class="card-variant">v1</span>
+            </div>
+          </div>
+          <div class="card" onclick="openLightbox(this)">
+            <div class="card-image">
+              <img src="01-headline/headline_v1_img2.png" alt="Headline v2" loading="lazy">
+              <div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div>
+            </div>
+            <div class="card-info"><h3>Headline</h3><span class="card-variant">v2</span></div>
+          </div>
+          <div class="card" onclick="openLightbox(this)">
+            <div class="card-image">
+              <img src="01-headline/headline_v1_img3.png" alt="Headline v3" loading="lazy">
+              <div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div>
+            </div>
+            <div class="card-info"><h3>Headline</h3><span class="card-variant">v3</span></div>
+          </div>
+          <div class="card" onclick="openLightbox(this)">
+            <div class="card-image">
+              <img src="01-headline/headline_v1_img4.png" alt="Headline v4" loading="lazy">
+              <div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div>
+            </div>
+            <div class="card-info"><h3>Headline</h3><span class="card-variant">v4</span></div>
+          </div>
+          <div class="card" onclick="openLightbox(this)">
+            <div class="card-image">
+              <img src="01-headline/headline_v1_img5.png" alt="Headline v5" loading="lazy">
+              <div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div>
+            </div>
+            <div class="card-info"><h3>Headline</h3><span class="card-variant">v5</span></div>
+          </div>
+          <div class="card" onclick="openLightbox(this)">
+            <div class="card-image">
+              <img src="01-headline/headline_v1_img6.png" alt="Headline v6" loading="lazy">
+              <div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div>
+            </div>
+            <div class="card-info"><h3>Headline</h3><span class="card-variant">v6</span></div>
+          </div>
+          <div class="card" onclick="openLightbox(this)">
+            <div class="card-image">
+              <img src="01-headline/headline_v1_img7.png" alt="Headline v7" loading="lazy">
+              <div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div>
+            </div>
+            <div class="card-info"><h3>Headline</h3><span class="card-variant">v7</span></div>
+          </div>
+          <div class="card" onclick="openLightbox(this)">
+            <div class="card-image">
+              <img src="01-headline/headline_v1_img8.png" alt="Headline v8" loading="lazy">
+              <div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div>
+            </div>
+            <div class="card-info"><h3>Headline</h3><span class="card-variant">v8</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template: Us Vs Them -->
+      <div class="template-section" data-template="07">
+        <div class="section-header">
+          <h2>#07 — Us Vs Them <span class="section-badge">8 creatives</span></h2>
+        </div>
+        <div class="card-grid">
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="07-us-vs-them/us-vs-them_v1_img1.png" alt="Us Vs Them v1" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Us Vs Them</h3><span class="card-variant">v1</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="07-us-vs-them/us-vs-them_v1_img2.png" alt="Us Vs Them v2" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Us Vs Them</h3><span class="card-variant">v2</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="07-us-vs-them/us-vs-them_v1_img3.png" alt="Us Vs Them v3" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Us Vs Them</h3><span class="card-variant">v3</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="07-us-vs-them/us-vs-them_v1_img4.png" alt="Us Vs Them v4" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Us Vs Them</h3><span class="card-variant">v4</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="07-us-vs-them/us-vs-them_v1_img5.png" alt="Us Vs Them v5" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Us Vs Them</h3><span class="card-variant">v5</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="07-us-vs-them/us-vs-them_v1_img6.png" alt="Us Vs Them v6" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Us Vs Them</h3><span class="card-variant">v6</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="07-us-vs-them/us-vs-them_v1_img7.png" alt="Us Vs Them v7" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Us Vs Them</h3><span class="card-variant">v7</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="07-us-vs-them/us-vs-them_v1_img8.png" alt="Us Vs Them v8" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Us Vs Them</h3><span class="card-variant">v8</span></div></div>
+        </div>
+      </div>
+
+      <!-- Template: Negative Marketing -->
+      <div class="template-section" data-template="09">
+        <div class="section-header">
+          <h2>#09 — Negative Marketing <span class="section-badge">9 creatives</span></h2>
+        </div>
+        <div class="card-grid">
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="09-negative-marketing/negative-marketing_v1_img1.png" alt="Negative Marketing v1" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Negative Marketing</h3><span class="card-variant">v1</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="09-negative-marketing/negative-marketing_v1_img2.png" alt="Negative Marketing v2" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Negative Marketing</h3><span class="card-variant">v2</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="09-negative-marketing/negative-marketing_v1_img3.png" alt="Negative Marketing v3" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Negative Marketing</h3><span class="card-variant">v3</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="09-negative-marketing/negative-marketing_v1_img4.png" alt="Negative Marketing v4" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Negative Marketing</h3><span class="card-variant">v4</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="09-negative-marketing/negative-marketing_v1_img5.png" alt="Negative Marketing v5" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Negative Marketing</h3><span class="card-variant">v5</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="09-negative-marketing/negative-marketing_v1_img6.png" alt="Negative Marketing v6" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Negative Marketing</h3><span class="card-variant">v6</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="09-negative-marketing/negative-marketing_v1_img7.png" alt="Negative Marketing v7" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Negative Marketing</h3><span class="card-variant">v7</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="09-negative-marketing/negative-marketing_v1_img8.png" alt="Negative Marketing v8" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Negative Marketing</h3><span class="card-variant">v8</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="09-negative-marketing/negative-marketing_v1_img9.png" alt="Negative Marketing v9" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Negative Marketing</h3><span class="card-variant">v9</span></div></div>
+        </div>
+      </div>
+
+      <!-- Template: Stat Surround Hero -->
+      <div class="template-section" data-template="13">
+        <div class="section-header">
+          <h2>#13 — Stat Surround Hero <span class="section-badge">9 creatives</span></h2>
+        </div>
+        <div class="card-grid">
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="13-stat-surround-hero/stat-surround-hero_v1_img1.png" alt="Stat Surround Hero v1" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Stat Surround Hero</h3><span class="card-variant">v1</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="13-stat-surround-hero/stat-surround-hero_v1_img2.png" alt="Stat Surround Hero v2" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Stat Surround Hero</h3><span class="card-variant">v2</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="13-stat-surround-hero/stat-surround-hero_v1_img3.png" alt="Stat Surround Hero v3" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Stat Surround Hero</h3><span class="card-variant">v3</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="13-stat-surround-hero/stat-surround-hero_v1_img4.png" alt="Stat Surround Hero v4" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Stat Surround Hero</h3><span class="card-variant">v4</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="13-stat-surround-hero/stat-surround-hero_v1_img5.png" alt="Stat Surround Hero v5" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Stat Surround Hero</h3><span class="card-variant">v5</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="13-stat-surround-hero/stat-surround-hero_v1_img6.png" alt="Stat Surround Hero v6" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Stat Surround Hero</h3><span class="card-variant">v6</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="13-stat-surround-hero/stat-surround-hero_v1_img7.png" alt="Stat Surround Hero v7" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Stat Surround Hero</h3><span class="card-variant">v7</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="13-stat-surround-hero/stat-surround-hero_v1_img8.png" alt="Stat Surround Hero v8" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Stat Surround Hero</h3><span class="card-variant">v8</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="13-stat-surround-hero/stat-surround-hero_v1_img9.png" alt="Stat Surround Hero v9" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Stat Surround Hero</h3><span class="card-variant">v9</span></div></div>
+        </div>
+      </div>
+
+      <!-- Template: Social Comment Screenshot -->
+      <div class="template-section" data-template="15">
+        <div class="section-header">
+          <h2>#15 — Social Comment Screenshot <span class="section-badge">8 creatives</span></h2>
+        </div>
+        <div class="card-grid">
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="15-social-comment-screenshot/social-comment-screenshot_v1_img1.png" alt="Social Comment v1" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Social Comment</h3><span class="card-variant">v1</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="15-social-comment-screenshot/social-comment-screenshot_v1_img2.png" alt="Social Comment v2" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Social Comment</h3><span class="card-variant">v2</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="15-social-comment-screenshot/social-comment-screenshot_v1_img3.png" alt="Social Comment v3" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Social Comment</h3><span class="card-variant">v3</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="15-social-comment-screenshot/social-comment-screenshot_v1_img4.png" alt="Social Comment v4" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Social Comment</h3><span class="card-variant">v4</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="15-social-comment-screenshot/social-comment-screenshot_v1_img5.png" alt="Social Comment v5" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Social Comment</h3><span class="card-variant">v5</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="15-social-comment-screenshot/social-comment-screenshot_v1_img6.png" alt="Social Comment v6" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Social Comment</h3><span class="card-variant">v6</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="15-social-comment-screenshot/social-comment-screenshot_v1_img7.png" alt="Social Comment v7" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Social Comment</h3><span class="card-variant">v7</span></div></div>
+          <div class="card" onclick="openLightbox(this)"><div class="card-image"><img src="15-social-comment-screenshot/social-comment-screenshot_v1_img8.png" alt="Social Comment v8" loading="lazy"><div class="card-overlay"><div class="card-overlay-actions"><button class="card-overlay-btn" title="Expand"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button></div></div></div><div class="card-info"><h3>Social Comment</h3><span class="card-variant">v8</span></div></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-backdrop" onclick="closeLightbox()"></div>
+  <div class="lightbox-content">
+    <button class="lightbox-close" onclick="closeLightbox()">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <button class="lightbox-nav prev" onclick="navLightbox(-1)">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <button class="lightbox-nav next" onclick="navLightbox(1)">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-info">
+      <h3 id="lightbox-title"></h3>
+      <span id="lightbox-counter"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Collect all cards for lightbox navigation
+  let allCards = [];
+  let currentIdx = 0;
+  let gridLarge = false;
+
+  function collectCards() {
+    allCards = [...document.querySelectorAll('.template-section:not([style*="display: none"]) .card')];
+  }
+
+  function openLightbox(card) {
+    collectCards();
+    currentIdx = allCards.indexOf(card);
+    updateLightbox();
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function navLightbox(dir) {
+    currentIdx = (currentIdx + dir + allCards.length) % allCards.length;
+    updateLightbox();
+  }
+
+  function updateLightbox() {
+    const card = allCards[currentIdx];
+    const img = card.querySelector('img');
+    const title = card.querySelector('.card-info h3').textContent;
+    const variant = card.querySelector('.card-variant').textContent;
+    document.getElementById('lightbox-img').src = img.src;
+    document.getElementById('lightbox-title').textContent = title + ' — ' + variant;
+    document.getElementById('lightbox-counter').textContent = (currentIdx + 1) + ' / ' + allCards.length;
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const lb = document.getElementById('lightbox');
+    if (!lb.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navLightbox(-1);
+    if (e.key === 'ArrowRight') navLightbox(1);
+  });
+
+  // Template filtering
+  function filterTemplate(id) {
+    document.querySelectorAll('.template-item').forEach(el => el.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    document.querySelectorAll('.template-section').forEach(section => {
+      if (id === 'all' || section.dataset.template === id) {
+        section.style.display = '';
+      } else {
+        section.style.display = 'none';
+      }
+    });
+  }
+
+  function showAll() {
+    document.querySelectorAll('.template-section').forEach(s => s.style.display = '');
+    document.querySelectorAll('.template-item').forEach(el => el.classList.remove('active'));
+    document.querySelector('.template-item').classList.add('active');
+  }
+
+  function toggleGrid() {
+    gridLarge = !gridLarge;
+    document.querySelectorAll('.card-grid').forEach(g => {
+      g.classList.toggle('large', gridLarge);
+    });
+  }
+
+  function downloadAll(e) {
+    e.preventDefault();
+    alert('Export feature — connect to your preferred export method');
+  }
+</script>
+
+</body>
+</html>

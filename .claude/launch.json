@@ -26,6 +26,13 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-l", "8091", "ad-safe-zone-checker"],
       "port": 8091
+    },
+    {
+      "name": "cpa-tracker",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "cwd": "cpa-tracker"
     }
   ]
 }

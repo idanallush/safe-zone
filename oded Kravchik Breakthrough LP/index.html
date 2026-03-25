@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שוברים תקרות | ד"ר עודד קרבצ'יק | קורס התפתחות אישית והסמכה לאימון מנטלי</title>
+<meta name="description" content="קורס התפתחות אישית והסמכה לאימון מנטלי בשיטת FTC. 10 מפגשים, 40 שעות, הסמכה מקצועית. ד״ר עודד קרבצ׳יק.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0D0D0D;
+  --bg-alt: #141414;
+  --bg-card: #1A1A1A;
+  --border: #2A2A2A;
+  --text: #FFFFFF;
+  --text-sec: #B0B0B0;
+  --gold: #D4A843;
+  --gold-light: #F5C842;
+  --gold-bg: rgba(212, 168, 67, 0.12);
+  --radius: 12px;
+  --radius-sm: 6px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Heebo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-weight: 300;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--gold); text-decoration: none; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.cta-btn {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 16px 40px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  font-family: 'Heebo', sans-serif;
+}
+.cta-btn:hover {
+  background: var(--gold-light);
+  transform: scale(1.02);
+}
+
+.section { padding: 100px 0; }
+.section-alt { background: var(--bg-alt); }
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+.section-title .gold { color: var(--gold); }
+.section-sub {
+  font-size: 1.1rem;
+  color: var(--text-sec);
+  margin-bottom: 48px;
+  max-width: 650px;
+  line-height: 1.8;
+}
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 100px 0 80px;
+  background: url('http://oded-kravtchik.co.il/wp-content/uploads/2024/06/DSC02261-scaled.jpg') center/cover no-repeat;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(13,13,13,0.75);
+  z-index: 1;
+}
+.hero > .container { position: relative; z-index: 2; }
+.hero-logo {
+  max-width: 120px;
+  margin-bottom: 32px;
+  opacity: 0.9;
+}
+.hero-badge {
+  display: inline-block;
+  border: 1px solid rgba(212,168,67,0.4);
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 18px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+  letter-spacing: 0.02em;
+}
+.hero-trust {
+  margin-top: 28px;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.4);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.hero h1 {
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 1.05;
+  margin-bottom: 20px;
+  letter-spacing: -0.03em;
+}
+.hero h1 .gold { color: var(--gold); }
+.hero-sub {
+  font-size: 1.1rem;
+  color: var(--text-sec);
+  margin-bottom: 32px;
+  line-height: 1.8;
+  max-width: 520px;
+}
+.hero-stats {
+  display: flex;
+  gap: 36px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+.hero-stat { text-align: center; }
+.hero-stat .num {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: var(--gold);
+  display: block;
+  line-height: 1.1;
+}
+.hero-stat .lbl {
+  font-size: 0.85rem;
+  color: var(--text-sec);
+}
+/* hero decorative SVG */
+.hero-decor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 300px;
+  opacity: 0.06;
+  z-index: 1;
+}
+
+/* ===== PROMO BANNER ===== */
+.promo-banner {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+}
+.promo-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.promo-deal {
+  color: var(--text-sec);
+  font-size: 0.92rem;
+  font-weight: 400;
+}
+.promo-cta {
+  color: var(--gold);
+  font-size: 0.88rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+.promo-cta:hover { color: var(--gold-light); }
+@media (max-width: 767px) {
+  .promo-inner { flex-direction: column; gap: 6px; }
+  .promo-deal { font-size: 0.85rem; text-align: center; }
+}
+
+/* ===== PROBLEM ===== */
+.problem-center { text-align: center; }
+.problem-center .section-title { max-width: 750px; margin: 0 auto 24px; }
+.problem-text {
+  font-size: 1.05rem;
+  color: var(--text-sec);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.9;
+  text-align: center;
+}
+.problem-text p { margin-bottom: 16px; }
+.problem-box {
+  margin: 48px auto 0;
+  padding: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-right: 4px solid var(--gold);
+  border-radius: var(--radius);
+  max-width: 750px;
+  text-align: center;
+}
+.problem-box p {
+  font-size: 1.15rem;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+/* ===== WHO ===== */
+.who-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+.who-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  transition: all 0.3s ease;
+}
+.who-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-4px);
+}
+.who-card .ic {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 16px;
+  color: var(--gold);
+}
+.who-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.who-card p {
+  color: var(--text-sec);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+/* ===== BENEFITS ===== */
+.ben-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.ben-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  transition: border-color 0.3s ease;
+}
+.ben-card:hover { border-color: var(--gold); }
+.ben-card .ic {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  color: var(--gold);
+}
+.ben-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.ben-card p {
+  color: var(--text-sec);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+/* ===== ABOUT ===== */
+.about-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 48px;
+  align-items: start;
+}
+.about-img {
+  border-radius: var(--radius);
+  object-fit: cover;
+  width: 100%;
+  max-height: 480px;
+}
+.about-points {
+  list-style: none;
+  padding: 0;
+}
+.about-points li {
+  padding: 10px 20px 10px 0;
+  position: relative;
+  color: var(--text-sec);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.about-points li::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 18px;
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+
+/* ===== SYLLABUS TIMELINE ===== */
+.timeline {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  padding-right: 40px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--gold);
+  opacity: 0.4;
+}
+.tl-phase {
+  margin-bottom: 12px;
+  position: relative;
+}
+.tl-phase-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 12px;
+  margin-top: 32px;
+  padding-right: 20px;
+  position: relative;
+}
+.tl-phase-label:first-child { margin-top: 0; }
+.tl-phase-label::before {
+  content: '';
+  position: absolute;
+  right: -34px;
+  top: 8px;
+  width: 14px;
+  height: 14px;
+  background: var(--gold);
+  border-radius: 50%;
+  border: 3px solid var(--bg-alt);
+}
+.tl-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  position: relative;
+}
+.tl-item::before {
+  content: '';
+  position: absolute;
+  right: -30px;
+  top: 22px;
+  width: 8px;
+  height: 8px;
+  background: var(--border);
+  border-radius: 50%;
+}
+.tl-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  cursor: pointer;
+  user-select: none;
+}
+.tl-header:hover { background: rgba(212, 168, 67, 0.05); border-radius: var(--radius); }
+.tl-header h3 { font-size: 1rem; font-weight: 700; }
+.tl-arrow {
+  color: var(--text-sec);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+.tl-arrow.open { transform: rotate(180deg); }
+.tl-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.tl-body.open { max-height: 300px; }
+.tl-body p {
+  padding: 0 24px 18px;
+  color: var(--text-sec);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+/* ===== VIDEO TESTIMONIALS ===== */
+.vid-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+.vid-card {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  transition: border-color 0.3s ease;
+}
+.vid-card:hover { border-color: var(--gold); }
+.vid-poster {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  padding-top: 56.25%;
+}
+.vid-thumb {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.vid-poster iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.vid-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+.vid-poster:hover .vid-play {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: var(--gold-light);
+}
+.vid-play svg {
+  width: 24px;
+  height: 24px;
+  margin-right: -2px;
+}
+.vid-name {
+  padding: 14px 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+}
+
+/* ===== TESTIMONIALS ===== */
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.test-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+}
+.test-card .qm {
+  font-size: 3.5rem;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 12px;
+  font-family: Georgia, serif;
+  opacity: 0.7;
+}
+.test-card p {
+  color: var(--text-sec);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* ===== PRICING ===== */
+.price-wrap { text-align: center; }
+.price-card {
+  max-width: 580px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 2px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 48px 40px;
+}
+.price-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 20px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+}
+.price-old {
+  font-size: 1.2rem;
+  color: var(--text-sec);
+  text-decoration: line-through;
+  margin-bottom: 4px;
+}
+.price-now {
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.price-now .cur { font-size: 1.6rem; font-weight: 700; }
+.price-vat {
+  color: var(--text-sec);
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+.price-save {
+  display: inline-block;
+  background: var(--gold-bg);
+  color: var(--gold);
+  padding: 8px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 28px;
+}
+.price-list {
+  list-style: none;
+  padding: 0;
+  text-align: right;
+  margin-bottom: 28px;
+}
+.price-list li {
+  padding: 8px 0;
+  color: var(--text-sec);
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.price-list li svg { flex-shrink: 0; color: var(--gold); }
+.price-pay {
+  color: var(--text-sec);
+  font-size: 0.8rem;
+  margin-top: 16px;
+}
+
+/* ===== FORM ===== */
+.form-wrap {
+  max-width: 520px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 48px 40px;
+  text-align: center;
+}
+.form-wrap h2 {
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.form-wrap .fs {
+  color: var(--text-sec);
+  margin-bottom: 28px;
+  font-size: 0.95rem;
+}
+.fg { margin-bottom: 14px; }
+.fg input {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: 'Heebo', sans-serif;
+  transition: border-color 0.3s ease;
+  direction: rtl;
+}
+.fg input::placeholder { color: #666; }
+.fg input:focus { outline: none; border-color: var(--gold); }
+.form-btn { width: 100%; margin-top: 6px; }
+.form-note {
+  color: var(--text-sec);
+  font-size: 0.82rem;
+  margin-top: 14px;
+}
+.form-ok {
+  display: none;
+  padding: 28px 0;
+  text-align: center;
+}
+.form-ok h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  padding: 48px 0 28px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.footer-logo {
+  max-width: 100px;
+  margin: 0 auto 20px;
+  opacity: 0.7;
+}
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+.footer-links a {
+  color: var(--text-sec);
+  font-size: 0.88rem;
+  transition: color 0.3s ease;
+}
+.footer-links a:hover { color: var(--gold); }
+.footer-contact {
+  color: var(--text-sec);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+.footer-contact a { color: var(--text-sec); }
+.footer-contact a:hover { color: var(--gold); }
+.footer-copy { color: #444; font-size: 0.78rem; margin-top: 12px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 767px) {
+  .hero { padding: 80px 0 60px; min-height: auto; }
+  .hero-trust { font-size: 0.75rem; }
+  .hero h1 { font-size: 2.8rem; }
+  .hero-logo { max-width: 80px; }
+  .section { padding: 64px 0; }
+  .section-title { font-size: 1.9rem; }
+  .who-grid { grid-template-columns: 1fr; }
+  .ben-grid { grid-template-columns: 1fr; }
+  .vid-grid { grid-template-columns: 1fr; }
+  .test-grid { grid-template-columns: 1fr; }
+  .about-layout { grid-template-columns: 1fr; }
+  .about-img { max-height: 300px; }
+  .price-card { padding: 36px 20px; }
+  .price-now { font-size: 2.6rem; }
+  .form-wrap { padding: 32px 20px; }
+  .cta-btn { width: 100%; padding: 16px 20px; }
+  .timeline { padding-right: 32px; }
+  .timeline::before { right: 8px; }
+  .tl-phase-label::before { right: -28px; }
+  .tl-item::before { right: -24px; }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .hero h1 { font-size: 3.5rem; }
+  .test-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== FEATURED SHORT ===== */
+.short-wrap {
+  max-width: 340px;
+  margin: 0 auto;
+}
+.short-poster {
+  position: relative;
+  padding-top: 177.78%; /* 9:16 */
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+.short-poster iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: 0;
+}
+.short-play {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 72px; height: 72px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+.short-poster:hover .short-play {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: var(--gold-light);
+}
+
+/* ===== FADE ===== */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <img src="http://oded-kravtchik.co.il/wp-content/uploads/2024/05/%D7%98%D7%A7%D7%A1-%D7%9E%D7%A2%D7%92%D7%9C.svg" alt="" class="hero-decor" loading="lazy" width="300" height="300">
+  <div class="container">
+    <img src="http://oded-kravtchik.co.il/wp-content/uploads/2023/01/FTC_LOGO_NEW-04_White-1-1.png" alt="FTC לוגו" class="hero-logo" loading="lazy" width="120" height="40">
+    <div class="hero-badge">קורס + הסמכה מקצועית | מחזור אפריל 2026</div>
+    <h1><span class="gold">שוברים</span><br>תקרות</h1>
+    <p class="hero-sub">קורס התפתחות אישית והסמכה לאימון מנטלי בשיטת FTC, מבית ד"ר עודד קרבצ'יק. 10 מפגשים של עומק, תרגול מעשי, ושינוי אמיתי בדרך שבה חושבים ופועלים.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="num">10</span><span class="lbl">מפגשים</span></div>
+      <div class="hero-stat"><span class="num">40</span><span class="lbl">שעות הכשרה</span></div>
+      <div class="hero-stat"><span class="num">28</span><span class="lbl">שנות ניסיון</span></div>
+      <div class="hero-stat"><span class="num">2026</span><span class="lbl">מחזור אפריל</span></div>
+    </div>
+    <a href="#contact-form" class="cta-btn">השאירו פרטים לשיחת התאמה</a>
+    <div class="hero-trust">כפי שנראה ב: בר אילן | הקריה האקדמית אונו | ערוץ 10 | לשכת המאמנים</div>
+  </div>
+</section>
+
+<!-- PROMO BANNER -->
+<div class="promo-banner">
+  <div class="container">
+    <div class="promo-inner">
+      <span class="promo-deal">מחזור אפריל 2026 נפתח להרשמה | הטבת הרשמה מוקדמת ₪1,500</span>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="section section-alt problem-center" id="problem">
+  <div class="container fade-in">
+    <h2 class="section-title">מרגישים שמשהו <span class="gold">תוקע?</span></h2>
+    <div class="problem-text">
+      <p>יודעים שאפשר יותר, אבל משהו מחזיק במקום. בקריירה יש תקרה שלא זזה, בזוגיות יש דפוסים שחוזרים, ומבפנים יש תחושה שמשהו חסר.</p>
+      <p>אולי כבר ניסיתם ספרים, סדנאות, הרצאות. זה עזר ליום-יומיים, ואז הכל חזר למקום הרגיל.</p>
+    </div>
+    <div class="problem-box">
+      <p>שיטת FTC עובדת אחרת. היא נכנסת לשפה הפנימית ומשנה את מה שאומרים לעצמנו. כי השיחה הפנימית קובעת הכל. מה מרגישים, מה עושים, ולאן מגיעים.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOR WHO -->
+<section class="section" id="for-who">
+  <div class="container fade-in">
+    <h2 class="section-title">למי <span class="gold">מתאים</span> הקורס</h2>
+    <p class="section-sub">מי שמזהה את עצמו באחד מהמקומות האלה, הקורס נבנה בשבילו.</p>
+    <div class="who-grid">
+      <div class="who-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6v14M16 12l6-6 6 6"/><path d="M8 22c0 7.7 6.3 14 14 14s14-6.3 14-14"/></svg>
+        <h3>תקועים בקריירה</h3>
+        <p>אותו דבר כבר שנים. יודעים שמגיע יותר, אבל לא מצליחים לזוז קדימה.</p>
+      </div>
+      <div class="who-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="15" cy="15" r="6"/><circle cx="29" cy="15" r="6"/><path d="M8 36c0-5 4-10 14-10s14 5 14 10"/></svg>
+        <h3>רוצים שינוי בזוגיות</h3>
+        <p>ביחד אבל לא באמת מחוברים. יש דפוסים שחוזרים ואף אחד לא יודע איך לשבור אותם.</p>
+      </div>
+      <div class="who-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="22" r="16"/><path d="M16 26c0 0 3 3 6 3s6-3 6-3"/><circle cx="16" cy="18" r="1.5" fill="currentColor"/><circle cx="28" cy="18" r="1.5" fill="currentColor"/></svg>
+        <h3>מחפשים כלים לניהול רגשות</h3>
+        <p>רגשות הם מערכת הפעלה. אם היא לא עובדת טוב, שום דבר בחיים לא באמת מתקדם.</p>
+      </div>
+      <div class="who-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6l5 10h11l-8 8 3 12-11-6-11 6 3-12-8-8h11z"/></svg>
+        <h3>מתחברים לפסיכולוגיה היהודית</h3>
+        <p>גישה שמבוססת על תורת הנפש היהודית. לא צריך להיות דתי, צריך להיות פתוח.</p>
+      </div>
+      <div class="who-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="8" width="32" height="24" rx="3"/><path d="M6 14h32"/><circle cx="22" cy="26" r="4"/></svg>
+        <h3>רוצים גם להנחות אחרים</h3>
+        <p>בסיום הקורס מקבלים הסמכה כמאמן/ת מנטלי/ת. כלי שאפשר להשתמש בו עם משפחה, חברים, או כמקצוע.</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:48px;">
+      <a href="#contact-form" class="cta-btn">מזהים את עצמכם? השאירו פרטים</a>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="section section-alt" id="benefits">
+  <div class="container fade-in">
+    <h2 class="section-title">מה <span class="gold">מקבלים</span> בקורס</h2>
+    <p class="section-sub">כלים מעשיים שנשארים הרבה אחרי שהקורס נגמר.</p>
+    <div class="ben-grid">
+      <div class="ben-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="22" r="10"/><path d="M22 12v0M18 14l-2-2M14 18l-2-2"/><path d="M16 22h-6M28 22h6"/><path d="M22 28v6"/><path d="M12 22a10 10 0 0 1 10-10" stroke-dasharray="4 3"/></svg>
+        <div><h3>פירוק אמונות מגבילות</h3><p>כלים לזיהוי מה מעכב, לפרק את זה ולבנות מחדש שפה פנימית שמניעה קדימה.</p></div>
+      </div>
+      <div class="ben-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16"/><path d="M30 6l4 4-4 4"/><path d="M34 10H28c-3.3 0-6 2.7-6 6v6"/></svg>
+        <div><h3>בניית תודעה מנצחת</h3><p>שיטות לשינוי השפה הפנימית. להחליף את הסיפור שמעכב בסיפור שמניע.</p></div>
+      </div>
+      <div class="ben-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 30V18c0-2 1-3 3-3h4l2-3h6l2 3h4c2 0 3 1 3 3v12c0 2-1 3-3 3H13c-2 0-3-1-3-3z"/><path d="M14 22h4M26 22h4M18 28c1 2 3 3 4 3s3-1 4-3"/></svg>
+        <div><h3>מיומנויות תקשורת</h3><p>כלים שעובדים בזוגיות, בעבודה, ובכל מערכת יחסים.</p></div>
+      </div>
+      <div class="ben-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6l5 10h11l-8 8 3 12-11-6-11 6 3-12-8-8h11z"/></svg>
+        <div><h3>זיהוי חוזקות אישיות</h3><p>לדעת מה החוזקות ואיך להשתמש בהן כדי להתקדם.</p></div>
+      </div>
+      <div class="ben-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="22" r="16"/><circle cx="22" cy="22" r="10"/><circle cx="22" cy="22" r="4"/></svg>
+        <div><h3>הצבת מטרות והשגתן</h3><p>תוכנית מדויקת עם שלבים ברורים. לא חלומות באוויר, כלים ליישום.</p></div>
+      </div>
+      <div class="ben-card">
+        <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="28" height="32" rx="2"/><path d="M14 6v-2M30 6v-2"/><path d="M14 18h16M14 24h10"/><path d="M18 30l3 3 5-5"/></svg>
+        <div><h3>הסמכה מקצועית</h3><p>תעודת מאמן/ת מנטלי/ת בשיטת FTC. אפשר להפוך למקצוע, או פשוט להשתמש בחיים.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="container fade-in">
+    <h2 class="section-title">על ד"ר <span class="gold">עודד קרבצ'יק</span></h2>
+    <div class="about-layout">
+      <img src="http://oded-kravtchik.co.il/wp-content/uploads/2024/12/WhatsApp-Image-2024-12-12-at-11.13.29.jpeg" alt="ד״ר עודד קרבצ׳יק" class="about-img" loading="lazy" width="500" height="600">
+      <div>
+        <p style="font-size:1.1rem;color:var(--text-sec);margin-bottom:28px;line-height:1.8;">מומחה באימון מנטלי, מרצה, סופר, ומייסד שיטת FTC. אחד הוותיקים והמנוסים ביותר בתחום האימון האישי והמנטלי בישראל.</p>
+        <ul class="about-points">
+          <li>כ-28 שנות ניסיון מעשי בלימוד ואימון</li>
+          <li>הכשיר ואימן אלפי מתאמנים ומאמנים פעילים</li>
+          <li>אימן ספורטאים, מנכ"לים, זוגות ויחידות עילית בצבא</li>
+          <li>כיהן כראש בית הספר לקואצ'ינג בבר אילן ובקריה האקדמית אונו</li>
+          <li>מנחה ויועץ זוגי בתוכנית "להציל את הנישואים" בערוץ 10</li>
+          <li>חבר בלשכת המאמנים בישראל</li>
+          <li>ליווה מאות זוגות בפריצת חסמים ב-20 שנים האחרונות</li>
+        </ul>
+        <div style="margin-top:36px;">
+          <a href="#contact-form" class="cta-btn">רוצים לשמוע עוד? השאירו פרטים</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SYLLABUS -->
+<section class="section section-alt" id="syllabus">
+  <div class="container fade-in">
+    <h2 class="section-title" style="text-align:center;">מבנה <span class="gold">הקורס</span></h2>
+    <p class="section-sub" style="text-align:center;margin:0 auto 48px;">10 מפגשים, 3 שלבים. מיסודות ועד הסמכה.</p>
+    <div class="timeline">
+      <div class="tl-phase-label">שלב א' | יסודות וצמיחה אישית</div>
+      <div class="tl-item"><div class="tl-header" onclick="toggleTl(this)" role="button" tabindex="0"><h3>מפגש 1: מבוא לעולם האימון</h3><span class="tl-arrow">&#9662;</span></div><div class="tl-body"><p>פתיחה ומבוא לעולם האימון וההתפתחות. הגדרת מטרות אישיות ובירור המהות.</p></div></div>
+      <div class="tl-item"><div class="tl-header" onclick="toggleTl(this)" role="button" tabindex="0"><h3>מפגש 2: אמונות מגבילות</h3><span class="tl-arrow">&#9662;</span></div><div class="tl-body"><p>כניסה לעולמות ההתפתחות האישית בפסיכולוגיה היהודית. אמונות מגבילות, ביניים ומשרתות.</p></div></div>
+      <div class="tl-item"><div class="tl-header" onclick="toggleTl(this)" role="button" tabindex="0"><h3>מפגש 3: מעגל השינוי</h3><span class="tl-arrow">&#9662;</span></div><div class="tl-body"><p>עולם האמונות, שלב המהות. מפת דרך להבנת תהליך השינוי האנושי.</p></div></div>
+      <div class="tl-item"><div class="tl-header" onclick="toggleTl(this)" role="button" tabindex="0"><h3>מפגש 4: הפחד כמראה פנימית</h3><span class="tl-arrow">&#9662;</span></div><div class="tl-body"><p>העמקה בעולם האמונות. זיהוי, פירוק ובנייה מחודשת. מעבר מהישרדות לצמיחה.</p></div></div>
+
+      <div class="tl-phase-label">שלב ב' | זהות, מיומנויות והגשמה</div>
+      <div class="tl-item"><div class="tl-header" onclick="toggleTl(this)" role="button" tabindex="0"><h3>מפגש 5: תקשורת באימון מנטלי</h3><span class="tl-arrow">&#9662;</span></div><div class="tl-body"><p>תקשורת כמנוע צמיחה והתפתחות. כלים מעשיים ליישום.</p></div></div>
+      <div class="tl-item"><div class="tl-header" onclick="toggleTl(this)" role="button" tabindex="0"><h3>מפגש 6: איתור חוזקות ויכולות</h3><span class="tl-arrow">&#9662;</span></div><div class="tl-body"><p>ייחודיות א': איתור חוזקות ויכולות. כלים לגילוי והטמעה.</p></div></div>
+      <div class="tl-item"><div class="tl-header" onclick="toggleTl(this)" role="button" tabindex="0"><h3>מפגש 7: מיומנויות המאמן כדרך חיים</h3><span class="tl-arrow">&#9662;</span></div><div class="tl-body"><p>יצירת רצף בין המרחב המקצועי למציאות היומיומית.</p></div></div>
+      <div class="tl-item"><div class="tl-header" onclick="toggleTl(this)" role="button" tabindex="0"><h3>מפגש 8: עיצוב זהות מנצחת</h3><span class="tl-arrow">&#9662;</span></div><div class="tl-body"><p>ייחודיות ב': עיצוב זהות מנצחת. ריפריימינג ומסגור מחדש.</p></div></div>
+
+      <div class="tl-phase-label">שלב ג' | תודעה, התפתחות וסיום</div>
+      <div class="tl-item"><div class="tl-header" onclick="toggleTl(this)" role="button" tabindex="0"><h3>מפגש 9: תודעה תוהית ותודעה מתוקנת</h3><span class="tl-arrow">&#9662;</span></div><div class="tl-body"><p>תרגול שינוי אמונות, הצבת יעדים ומטרות ממקום בריא ומדויק.</p></div></div>
+      <div class="tl-item"><div class="tl-header" onclick="toggleTl(this)" role="button" tabindex="0"><h3>מפגש 10: טקס סיום וחלוקת תעודות</h3><span class="tl-arrow">&#9662;</span></div><div class="tl-body"><p>מפגש סיום חגיגי. מבחן עיוני, טקס סיום, סיכום המסע וחלוקת תעודות.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- IMAGE BREAK -->
+<section style="position:relative;height:300px;overflow:hidden;">
+  <img src="http://oded-kravtchik.co.il/wp-content/uploads/2024/06/MG_2146-scaled.jpg" alt="ד״ר עודד קרבצ׳יק מרצה" loading="lazy" width="1200" height="300" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;">
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,var(--bg-alt) 0%,rgba(20,20,20,0.4) 50%,var(--bg) 100%);"></div>
+</section>
+
+<!-- VIDEOS -->
+<section class="section" id="videos">
+  <div class="container fade-in">
+    <h2 class="section-title" style="text-align:center;">מה אומרים <span class="gold">הבוגרים</span></h2>
+    <p class="section-sub" style="text-align:center;margin:0 auto 48px;">אנשים אמיתיים שעברו את התהליך.</p>
+    <div class="vid-grid">
+      <div class="vid-card">
+        <div class="vid-poster" data-video="pQqC-aQDiCY" data-start="1">
+          <img src="http://oded-kravtchik.co.il/wp-content/uploads/2024/06/קורס-FTC-החופש-לבחור-קטעים-נבחרים.jpg" alt="עדות יונתן שוקרון" class="vid-thumb" loading="lazy" width="640" height="360">
+          <div class="vid-play"><svg viewBox="0 0 24 24" fill="#0D0D0D"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="vid-name">יונתן שוקרון</div>
+      </div>
+      <div class="vid-card">
+        <div class="vid-poster" data-video="DfF0ezWUuuc" data-start="3">
+          <img src="http://oded-kravtchik.co.il/wp-content/uploads/2024/06/קורס-FTC-החופש-לבחור-קטעים-נבחרים-3.jpg" alt="עדות נוי מאמנת כושר" class="vid-thumb" loading="lazy" width="640" height="360">
+          <div class="vid-play"><svg viewBox="0 0 24 24" fill="#0D0D0D"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="vid-name">נוי, מאמנת כושר</div>
+      </div>
+      <div class="vid-card">
+        <div class="vid-poster" data-video="QDF0maP7FeY" data-start="2">
+          <img src="http://oded-kravtchik.co.il/wp-content/uploads/2024/06/קורס-FTC-החופש-לבחור-קטעים-נבחרים-2-1.jpg" alt="עדות ימית גור" class="vid-thumb" loading="lazy" width="640" height="360">
+          <div class="vid-play"><svg viewBox="0 0 24 24" fill="#0D0D0D"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="vid-name">ימית גור</div>
+      </div>
+      <div class="vid-card">
+        <div class="vid-poster" data-video="SwbiSaM4CQA" data-start="3">
+          <img src="http://oded-kravtchik.co.il/wp-content/uploads/2024/06/קורס-FTC-החופש-לבחור-קטעים-נבחרים-4.jpg" alt="עדות ארטיום דולגופיאט" class="vid-thumb" loading="lazy" width="640" height="360">
+          <div class="vid-play"><svg viewBox="0 0 24 24" fill="#0D0D0D"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="vid-name">ארטיום דולגופיאט</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:48px;">
+      <a href="#contact-form" class="cta-btn">רוצים לשמוע איך זה עובד? השאירו פרטים</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section section-alt" id="testimonials">
+  <div class="container fade-in">
+    <div class="test-grid">
+      <div class="test-card"><div class="qm">&#x201F;&#x201F;</div><p>נהנתי מכל רגע. עודד הוא בן אדם מדהים, קשוב ומרתק. למדתי ממנו המון.</p></div>
+      <div class="test-card"><div class="qm">&#x201F;&#x201F;</div><p>קורס מעולה, שהרים לנו המון. נתן לנו כלים לשינוי ושיפור בחיי היומיום. עודד אלוף, אפשר להקשיב לו בלי סוף.</p></div>
+      <div class="test-card"><div class="qm">&#x201F;&#x201F;</div><p>עודד היקר, רציתי לומר שוב תודה ענקית! על הקורס, הכלים והליווי. הרגשתי שינוי אמיתי מהמפגש הראשון.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED SHORT -->
+<section class="section" id="featured-short">
+  <div class="container fade-in" style="text-align:center;">
+    <h2 class="section-title" style="text-align:center;margin-bottom:12px;">רגע של <span class="gold">השראה</span></h2>
+    <p class="section-sub" style="text-align:center;margin:0 auto 36px;">סרטון קצר שנותן טעימה מהגישה של עודד.</p>
+    <div class="short-wrap">
+      <div class="short-poster" data-video="L6Q5b6DMVhw">
+        <img src="http://oded-kravtchik.co.il/wp-content/uploads/2026/03/Screenshot-2026-03-22-at-18.24.58.png" alt="סרטון השראה קצר" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" loading="lazy" width="720" height="1280">
+        <div class="short-play"><svg viewBox="0 0 24 24" fill="#0D0D0D" width="28" height="28"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section price-wrap" id="pricing">
+  <div class="container fade-in">
+    <h2 class="section-title" style="text-align:center;">מחיר <span class="gold">והטבה</span></h2>
+    <div class="price-card">
+      <div class="price-badge">הטבה מיוחדת לחג</div>
+      <div class="price-old">&#8362;10,900</div>
+      <div class="price-now"><span class="cur">&#8362;</span>9,400</div>
+      <div class="price-vat">כולל מע"מ</div>
+      <div class="price-save">חיסכון של &#8362;1,500</div>
+      <ul class="price-list">
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>פחות מ-&#8362;1,000 למפגש של 4 שעות עם ד"ר קרבצ'יק</li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>הכשרה מקצועית, תעודת הסמכה, וכלים שנשארים</li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>אפשר לפרוס עד 10 תשלומים נוחים</li>
+      </ul>
+      <a href="#contact-form" class="cta-btn" style="width:100%;">השאירו פרטים לשיחת התאמה</a>
+      <div class="price-pay">אמצעי תשלום: כרטיס אשראי | העברה בנקאית | ביט | פייבוקס</div>
+      <p style="color:var(--text-sec);font-size:0.82rem;margin-top:12px;">ההטבה בתוקף לתקופה מוגבלת</p>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="section section-alt" id="contact-form">
+  <div class="container fade-in">
+    <div class="form-wrap">
+      <h2>רוצים לשמוע עוד?</h2>
+      <p class="fs">השאירו פרטים ועודד יחזור אליכם</p>
+      <form id="leadForm" method="POST" action="https://hooks.zapier.com/hooks/catch/5016768/upgcdrt/">
+        <div class="fg"><input type="text" name="name" placeholder="שם מלא" required aria-label="שם מלא" autocomplete="name"></div>
+        <div class="fg"><input type="tel" name="phone" placeholder="טלפון" required aria-label="טלפון" autocomplete="tel" dir="ltr" style="text-align:right;"></div>
+        <div class="fg"><input type="email" name="email" placeholder="אימייל" required aria-label="אימייל" autocomplete="email" dir="ltr" style="text-align:right;"></div>
+        <input type="hidden" name="utm_source" value="">
+        <input type="hidden" name="utm_medium" value="">
+        <input type="hidden" name="utm_campaign" value="">
+        <input type="hidden" name="utm_content" value="">
+        <input type="hidden" name="utm_ad" value="">
+        <button type="submit" class="cta-btn form-btn">שלחו לי פרטים</button>
+      </form>
+      <p class="form-note">השיחה ללא עלות וללא התחייבות</p>
+      <div class="form-ok" id="formOk"><h3>הפרטים נשלחו</h3><p style="color:var(--text-sec);">עודד יחזור אליכם בהקדם. תודה!</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <img src="http://oded-kravtchik.co.il/wp-content/uploads/2023/01/FTC_LOGO_NEW-04_White-1-1.png" alt="FTC לוגו" class="footer-logo" loading="lazy" width="100" height="33">
+    <div class="footer-links">
+      <a href="https://www.instagram.com/oded_kravtchik" target="_blank" rel="noopener noreferrer">@oded_kravtchik</a>
+      <a href="https://oded-kravtchik.co.il" target="_blank" rel="noopener noreferrer">oded-kravtchik.co.il</a>
+    </div>
+    <p class="footer-contact"><a href="mailto:believe2be2oded@gmail.com">believe2be2oded@gmail.com</a> | <a href="tel:054-8362202">054-8362202</a></p>
+    <p class="footer-copy">&copy; כל הזכויות שמורות לד"ר עודד קרבצ'יק</p>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    var t=document.querySelector(this.getAttribute('href'));
+    if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+
+function toggleTl(h){
+  var b=h.nextElementSibling,a=h.querySelector('.tl-arrow');
+  b.classList.toggle('open');a.classList.toggle('open');
+  h.setAttribute('aria-expanded',b.classList.contains('open'));
+}
+document.querySelectorAll('.tl-header').forEach(function(h){
+  h.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleTl(this);}});
+});
+
+document.querySelectorAll('.vid-poster').forEach(function(p){
+  p.addEventListener('click',function(){
+    var id=this.getAttribute('data-video');
+    var start=this.getAttribute('data-start')||'0';
+    var iframe=document.createElement('iframe');
+    iframe.src='https://www.youtube.com/embed/'+id+'?autoplay=1&rel=0&start='+start;
+    iframe.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+    iframe.setAttribute('allowfullscreen','');
+    this.innerHTML='';
+    this.style.cursor='default';
+    this.appendChild(iframe);
+  });
+});
+
+var sp=document.querySelector('.short-poster');
+if(sp){sp.addEventListener('click',function(){
+  var id=this.getAttribute('data-video');
+  var iframe=document.createElement('iframe');
+  iframe.src='https://www.youtube.com/embed/'+id+'?autoplay=1&rel=0';
+  iframe.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+  iframe.setAttribute('allowfullscreen','');
+  this.innerHTML='';
+  this.style.cursor='default';
+  this.appendChild(iframe);
+});}
+
+var obs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.1});
+document.querySelectorAll('.fade-in').forEach(function(el){obs.observe(el);});
+
+var form=document.getElementById('leadForm');
+
+// Populate UTM hidden fields from URL params
+var urlParams=new URLSearchParams(window.location.search);
+['utm_source','utm_medium','utm_campaign','utm_content','utm_ad'].forEach(function(p){
+  var field=form.querySelector('input[name="'+p+'"]');
+  if(field&&urlParams.get(p))field.value=urlParams.get(p);
+});
+
+var inputs=form.querySelectorAll('input[required]');
+inputs.forEach(function(i){
+  i.addEventListener('invalid',function(){
+    if(i.name==='name')i.setCustomValidity('נא להזין שם מלא');
+    if(i.name==='phone')i.setCustomValidity('נא להזין מספר טלפון');
+    if(i.name==='email')i.setCustomValidity('נא להזין כתובת אימייל תקינה');
+  });
+  i.addEventListener('input',function(){i.setCustomValidity('');});
+});
+
+form.addEventListener('submit',function(e){
+  e.preventDefault();
+  if(!form.checkValidity()){form.reportValidity();return;}
+  var fd=new FormData(form);
+  var d={};
+  fd.forEach(function(v,k){d[k]=v;});
+  navigator.sendBeacon(form.action,new Blob([JSON.stringify(d)],{type:'application/json'}));
+  window.location.href='https://oded-kravtchik.co.il/thankyoupage/';
+});
+</script>
+</body>
+</html>

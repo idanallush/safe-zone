@@ -1,0 +1,243 @@
+%!Adobe-FontList 1.23
+%Locale:0x409
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Invalid
+OutlineFileName:/Users/justsaray/Desktop/Hillel presentation Folder/Document fonts/AdobeFnt23.lst
+FileLength:5582
+FileModTime:668631811
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:ArialMT
+FamilyName:Arial
+StyleName:Regular
+MenuName:Arial
+StyleBits:0
+WeightClass:400
+WidthClass:5
+AngleClass:0
+FullName:Arial
+WritingScript:Roman
+OutlineFileName:/Users/justsaray/Desktop/Hillel presentation Folder/Document fonts/Arial.ttf
+DataFormat:sfntData
+hasSVG:no
+VariableFontType:NonVariableFont
+FileLength:773236
+FileModTime:668631811
+NameArray:0,Mac,4,Arial
+NameArray:0,Win,1,Arial
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:FbDisco-Bold
+FamilyName:Fb Disco
+StyleName:Bold
+MenuName:Fb Disco
+StyleBits:2
+WeightClass:700
+WidthClass:5
+AngleClass:0
+FullName:FbDisco Bold
+FamilyNameNative:
+StyleNameNative:Bold
+FullNameNative:
+WritingScript:Hebrew
+OutlineFileName:/Users/justsaray/Desktop/Hillel presentation Folder/Document fonts/FbDisco-Bold.otf
+DataFormat:sfntData
+hasSVG:no
+VariableFontType:NonVariableFont
+FileLength:62536
+FileModTime:638445930
+NameArray:0,Mac,4,FbDisco Bold
+NameArray:0,Win,1,Fb Disco
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:AlmoniMLv5AAA-Black
+FamilyName:Almoni ML v5 AAA
+StyleName:Black
+MenuName:Almoni ML v5 AAA Black
+StyleBits:0
+WeightClass:900
+WidthClass:5
+AngleClass:0
+FullName:Almoni ML v5 AAA Black
+WritingScript:Roman
+OutlineFileName:/Users/justsaray/Desktop/Hillel presentation Folder/Document fonts/almoni-black-aaa.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+VariableFontType:NonVariableFont
+FileLength:187052
+FileModTime:637088892
+NameArray:0,Mac,4,Almoni ML v5 AAA Black
+NameArray:0,Win,1,Almoni ML v5 AAA Black
+NameArray:0,Win,16,Almoni ML v5 AAA
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:AlmoniMLv5AAA-Bold
+FamilyName:Almoni ML v5 AAA
+StyleName:Bold
+MenuName:Almoni ML v5 AAA
+StyleBits:2
+WeightClass:700
+WidthClass:5
+AngleClass:0
+FullName:Almoni ML v5 AAA Bold
+WritingScript:Roman
+OutlineFileName:/Users/justsaray/Desktop/Hillel presentation Folder/Document fonts/almoni-bold-aaa.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+VariableFontType:NonVariableFont
+FileLength:179884
+FileModTime:637088918
+NameArray:0,Mac,4,Almoni ML v5 AAA Bold
+NameArray:0,Win,1,Almoni ML v5 AAA
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:AlmoniMLv5AAA-D-Bold
+FamilyName:Almoni ML v5 AAA
+StyleName:DemiBold
+MenuName:Almoni ML v5 AAA D-Bold
+StyleBits:0
+WeightClass:600
+WidthClass:5
+AngleClass:0
+FullName:Almoni ML v5 AAA DemiBold
+WritingScript:Roman
+OutlineFileName:/Users/justsaray/Desktop/Hillel presentation Folder/Document fonts/almoni-demibold-aaa.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+VariableFontType:NonVariableFont
+FileLength:178716
+FileModTime:637088916
+NameArray:0,Mac,18,Almoni ML v5 AAA D-Bold
+NameArray:0,Mac,4,Almoni ML v5 AAA DemiBold
+NameArray:0,Win,1,Almoni ML v5 AAA D-Bold
+NameArray:0,Win,16,Almoni ML v5 AAA
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:AlmoniMLv5AAA-Medium
+FamilyName:Almoni ML v5 AAA
+StyleName:Medium
+MenuName:Almoni ML v5 AAA Medium
+StyleBits:0
+WeightClass:500
+WidthClass:5
+AngleClass:0
+FullName:Almoni ML v5 AAA Medium
+WritingScript:Roman
+OutlineFileName:/Users/justsaray/Desktop/Hillel presentation Folder/Document fonts/almoni-medium-aaa.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+VariableFontType:NonVariableFont
+FileLength:177608
+FileModTime:637088908
+NameArray:0,Mac,4,Almoni ML v5 AAA Medium
+NameArray:0,Win,1,Almoni ML v5 AAA Medium
+NameArray:0,Win,16,Almoni ML v5 AAA
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:AlmoniMLv5AAA-Regular
+FamilyName:Almoni ML v5 AAA
+StyleName:Regular
+MenuName:Almoni ML v5 AAA
+StyleBits:0
+WeightClass:400
+WidthClass:5
+AngleClass:0
+FullName:Almoni ML v5 AAA Regular
+WritingScript:Roman
+OutlineFileName:/Users/justsaray/Desktop/Hillel presentation Folder/Document fonts/almoni-regular-aaa.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+VariableFontType:NonVariableFont
+FileLength:176060
+FileModTime:637088924
+NameArray:0,Mac,4,Almoni ML v5 AAA Regular
+NameArray:0,Win,1,Almoni ML v5 AAA
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:AlmoniMLv5AAA-U-Black
+FamilyName:Almoni ML v5 AAA
+StyleName:UltraBlack
+MenuName:Almoni ML v5 AAA U-Black
+StyleBits:0
+WeightClass:905
+WidthClass:5
+AngleClass:0
+FullName:Almoni ML v5 AAA UltraBlack
+WritingScript:Roman
+OutlineFileName:/Users/justsaray/Desktop/Hillel presentation Folder/Document fonts/almoni-ultrablack-aaa.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+VariableFontType:NonVariableFont
+FileLength:184720
+FileModTime:637088912
+NameArray:0,Mac,18,Almoni ML v5 AAA U-Black
+NameArray:0,Mac,4,Almoni ML v5 AAA UltraBlack
+NameArray:0,Win,1,Almoni ML v5 AAA U-Black
+NameArray:0,Win,16,Almoni ML v5 AAA
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:AlmoniMLv5AAA-U-Bold
+FamilyName:Almoni ML v5 AAA
+StyleName:UltraBold
+MenuName:Almoni ML v5 AAA U-Bold
+StyleBits:0
+WeightClass:800
+WidthClass:5
+AngleClass:0
+FullName:Almoni ML v5 AAA UltraBold
+WritingScript:Roman
+OutlineFileName:/Users/justsaray/Desktop/Hillel presentation Folder/Document fonts/almoni-ultrabold-aaa.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+VariableFontType:NonVariableFont
+FileLength:177532
+FileModTime:637088920
+NameArray:0,Mac,18,Almoni ML v5 AAA U-Bold
+NameArray:0,Mac,4,Almoni ML v5 AAA UltraBold
+NameArray:0,Win,1,Almoni ML v5 AAA U-Bold
+NameArray:0,Win,16,Almoni ML v5 AAA
+%EndFont
+

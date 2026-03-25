@@ -1,0 +1,64 @@
+{
+  "clients": [
+    {
+      "id": "albert-levi",
+      "name": "Albert Levi Art",
+      "metaAdAccountId": "act_400319919198934",
+      "monthlyBudget": 5000,
+      "currency": "USD",
+      "billingCycleStart": 1,
+      "alertThresholds": {
+        "overspend": 1.15,
+        "underspend": 0.70
+      }
+    },
+    {
+      "id": "hadva-erez",
+      "name": "חדוה ארז - מרכז תהודה",
+      "metaAdAccountId": "act_940214902810596",
+      "monthlyBudget": 3000,
+      "currency": "ILS",
+      "billingCycleStart": 1,
+      "alertThresholds": {
+        "overspend": 1.15,
+        "underspend": 0.70
+      }
+    },
+    {
+      "id": "shenkar",
+      "name": "שנקר הנדסאים",
+      "metaAdAccountId": "act_309187208626257",
+      "monthlyBudget": 8000,
+      "currency": "ILS",
+      "billingCycleStart": 1,
+      "alertThresholds": {
+        "overspend": 1.15,
+        "underspend": 0.70
+      }
+    },
+    {
+      "id": "eduardo",
+      "name": "Paseos Polares (Eduardo)",
+      "metaAdAccountId": "act_1287304675315270",
+      "monthlyBudget": 4000,
+      "currency": "USD",
+      "billingCycleStart": 1,
+      "alertThresholds": {
+        "overspend": 1.15,
+        "underspend": 0.70
+      }
+    },
+    {
+      "id": "shameret-hazorea",
+      "name": "שמרת הזורע",
+      "metaAdAccountId": "act_333332254035906",
+      "monthlyBudget": 6000,
+      "currency": "ILS",
+      "billingCycleStart": 1,
+      "alertThresholds": {
+        "overspend": 1.15,
+        "underspend": 0.70
+      }
+    }
+  ]
+}
