@@ -89,15 +89,16 @@
 
         .safe-zone-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; display: none; }
         .safe-zone-overlay.active { display: block; }
-        .sz-danger { position: absolute; background: rgba(218, 165, 32, 0.28); }
+        .sz-danger { position: absolute; background: rgba(255, 200, 0, 0.30); }
         .sz-line { position: absolute; }
-        .sz-line.horizontal { height: 0; left: 0; right: 0; border-top: 1.5px dashed rgba(0, 220, 130, 0.9); }
-        .sz-line.vertical { width: 0; top: 0; bottom: 0; border-left: 1.5px dashed rgba(0, 220, 130, 0.9); }
+        .sz-line.horizontal { height: 0; left: 0; right: 0; border-top: 2px dashed rgba(255, 220, 0, 0.95); }
+        .sz-line.vertical { width: 0; top: 0; bottom: 0; border-left: 2px dashed rgba(255, 220, 0, 0.95); }
         .sz-label {
-            position: absolute; color: #00dc82; font-size: 9px; font-weight: 700;
+            position: absolute; color: #FFD700; font-size: 10px; font-weight: 800;
             white-space: nowrap; direction: ltr; text-align: center;
             font-family: -apple-system, sans-serif;
-            background: rgba(0,0,0,0.65); padding: 2px 6px; border-radius: 4px; line-height: 1;
+            background: rgba(0,0,0,0.80); padding: 2px 7px; border-radius: 4px; line-height: 1;
+            border: 1px solid rgba(255, 220, 0, 0.3);
         }
 
         .toggle-track {
@@ -860,9 +861,9 @@ function buildStoryMockup(p) {
             </div>
             <!-- Profile row -->
             <div style="position:absolute;top:16px;left:6px;display:flex;align-items:center;gap:4px;">
-                <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.3);"></div>
+                <img src="220829521_102123092143924_6403435025276078538_n.jpg" style="width:18px;height:18px;border-radius:50%;object-fit:cover;">
                 <div>
-                    <div style="color:white;font-size:7px;font-weight:600;">${isFB ? 'Milega' : 'milega'}</div>
+                    <div style="color:white;font-size:7px;font-weight:600;">${isFB ? 'Bright Agency' : 'Bright'}</div>
                     <div style="color:rgba(255,255,255,0.5);font-size:5px;">Sponsored</div>
                 </div>
             </div>
@@ -905,10 +906,10 @@ function buildReelsMockup(p) {
             <!-- Bottom left: profile + name + CTA -->
             <div style="position:absolute;bottom:10px;left:0;right:28px;padding:0 8px;">
                 <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
-                    <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.3);"></div>
-                    <span style="color:white;font-size:7px;font-weight:600;">${isFB ? 'Milega מילגה' : 'milega'}</span>
+                    <img src="220829521_102123092143924_6403435025276078538_n.jpg" style="width:18px;height:18px;border-radius:50%;object-fit:cover;">
+                    <span style="color:white;font-size:7px;font-weight:600;">${isFB ? 'Bright Agency' : 'Bright'}</span>
                 </div>
-                ${!isFB ? '<div style="color:white;font-size:6px;opacity:0.85;margin-bottom:3px;" dir="rtl">ספה טוסקנה לישיבה, שכיבה ורביצה...</div>' : ''}
+                ${!isFB ? '<div style="color:white;font-size:6px;opacity:0.85;margin-bottom:3px;" dir="rtl">Bright — קריאייטיב שמביא תוצאות</div>' : ''}
                 <div style="${isFB ? 'background:white;border-radius:6px;padding:5px 0;text-align:center;font-size:8px;font-weight:600;color:#333;' : 'display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.15);border-radius:6px;padding:5px 8px;'}margin-bottom:3px;">
                     ${isFB ? 'Order now' : '<span style="color:white;font-size:8px;font-weight:500;">Order now</span><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>'}
                 </div>
@@ -1003,8 +1004,8 @@ function buildStoryCarouselMockup(p) {
         <div style="position:absolute;inset:0;z-index:15;pointer-events:none;" dir="ltr">
             <div style="position:absolute;top:8px;left:6px;right:6px;display:flex;gap:2px;">${progressHTML}</div>
             <div style="position:absolute;top:16px;left:8px;display:flex;align-items:center;gap:4px;">
-                <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.3);"></div>
-                <span style="color:white;font-size:7px;font-weight:600;">milega</span>
+                <img src="220829521_102123092143924_6403435025276078538_n.jpg" style="width:18px;height:18px;border-radius:50%;object-fit:cover;">
+                <span style="color:white;font-size:7px;font-weight:600;">Bright</span>
                 <span style="color:rgba(255,255,255,0.5);font-size:5px;">Sponsored</span>
             </div>
             <div style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:3px;align-items:center;">${dotsHTML}</div>
@@ -1049,8 +1050,8 @@ function buildReelsCarouselMockup(p) {
             <div style="position:absolute;bottom:10px;left:0;right:28px;padding:0 8px;">
                 <div style="display:flex;gap:3px;align-items:center;margin-bottom:4px;">${dotsHTML}</div>
                 <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
-                    <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.3);"></div>
-                    <span style="color:white;font-size:7px;font-weight:600;">milega</span>
+                    <img src="220829521_102123092143924_6403435025276078538_n.jpg" style="width:18px;height:18px;border-radius:50%;object-fit:cover;">
+                    <span style="color:white;font-size:7px;font-weight:600;">Bright</span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.15);border-radius:6px;padding:5px 8px;margin-bottom:3px;">
                     <span style="color:white;font-size:8px;font-weight:500;">Shop now</span>
@@ -1082,9 +1083,9 @@ function buildFeedPostMockup(p) {
         <div style="position:relative;">
             <!-- Header -->
             <div style="display:flex;align-items:center;padding:8px 10px;gap:6px;" dir="ltr">
-                <div style="width:28px;height:28px;border-radius:50%;background:#e0e0e0;flex-shrink:0;"></div>
+                <img src="220829521_102123092143924_6403435025276078538_n.jpg" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;">
                 <div style="flex:1;">
-                    <div style="font-size:11px;font-weight:600;color:#1a1a1a;">${isIG ? 'milega' : 'Milega מילגה'}</div>
+                    <div style="font-size:11px;font-weight:600;color:#1a1a1a;">${isIG ? 'Bright' : 'Bright Agency'}</div>
                     <div style="font-size:9px;color:#999;">${isIG ? 'Ad' : 'Sponsored'}</div>
                 </div>
             </div>
@@ -1103,7 +1104,7 @@ function buildFeedPostMockup(p) {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </div>
             <div style="padding:0 10px 6px;" dir="rtl">
-                <span style="font-size:9px;color:#333;"><b>milega</b> קולקציית המצעים Cloud Touch</span>
+                <span style="font-size:9px;color:#333;"><b>Bright</b> קריאייטיב שמביא תוצאות</span>
             </div>
             ` : `
             <!-- FB: like/comment/share -->
@@ -1133,7 +1134,7 @@ function buildFeedCarouselMockup(p) {
                 <img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block;">
             </div>
             <div style="padding:6px 8px;background:#fff;" dir="rtl">
-                <div style="font-size:8px;color:#333;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">קולקציית המצעים Cloud Touch</div>
+                <div style="font-size:8px;color:#333;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">Bright Agency</div>
                 <div style="display:inline-block;padding:3px 10px;background:#E4E6EB;border-radius:4px;font-size:8px;font-weight:600;color:#333;">Order now</div>
             </div>
         </div>
@@ -1147,9 +1148,9 @@ function buildFeedCarouselMockup(p) {
         <div id="${mid}" data-idx="0" data-total="${total}" style="position:relative;">
             <!-- Header (simplified) -->
             <div style="display:flex;align-items:center;padding:8px 10px;gap:6px;" dir="ltr">
-                <div style="width:28px;height:28px;border-radius:50%;background:#e0e0e0;"></div>
+                <img src="220829521_102123092143924_6403435025276078538_n.jpg" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
                 <div style="flex:1;">
-                    <div style="font-size:11px;font-weight:600;color:#1a1a1a;">${isIG ? 'milega' : 'Milega מילגה'}</div>
+                    <div style="font-size:11px;font-weight:600;color:#1a1a1a;">${isIG ? 'Bright' : 'Bright Agency'}</div>
                     <div style="font-size:9px;color:#999;">${isIG ? 'Ad' : 'Sponsored'}</div>
                 </div>
             </div>
@@ -1179,7 +1180,7 @@ function buildFeedCarouselMockup(p) {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
             </div>
             <div style="padding:0 10px 6px;" dir="rtl">
-                <span style="font-size:9px;color:#333;"><b>milega</b> קולקציית המצעים Cloud Touch</span>
+                <span style="font-size:9px;color:#333;"><b>Bright</b> קריאייטיב שמביא תוצאות</span>
             </div>
             ` : `
             <!-- FB: reactions + like/comment/share -->
